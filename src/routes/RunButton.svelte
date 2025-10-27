@@ -1,11 +1,12 @@
 <script lang="ts">
-    let { controlInput } = $props();
+    let { controlInput, textInput } = $props();
+    import { buttonRun } from "./buttonRun.svelte";
 
-    function logInputs() {
-        console.log($state.snapshot(controlInput));
+    function onClickButtonRun() {
+        buttonRun(controlInput, textInput);
     }
 </script>
 
-<button type="button" id="run-button" onclick={logInputs}>
+<button type="button" id="run-button" onclick={onClickButtonRun}>
     <span id="button-text">Run Calculation</span>
 </button>

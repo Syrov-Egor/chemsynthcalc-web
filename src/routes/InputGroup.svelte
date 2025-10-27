@@ -3,6 +3,8 @@
     import EquationInput from "./EquationInput.svelte";
     import RunButton from "./RunButton.svelte";
 
+    let textInput = $state("");
+
     let controlInput = $state({
         mode: "masses",
         algorithm: "auto",
@@ -17,5 +19,5 @@
 </script>
 
 <ModeControl bind:controlInput />
-<EquationInput />
-<RunButton {controlInput} />
+<EquationInput bind:textInput />
+<RunButton {controlInput} {textInput} />
