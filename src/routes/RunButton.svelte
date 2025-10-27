@@ -2,7 +2,7 @@
     let { controlInput } = $props();
 
     function logInputs() {
-        console.log(controlInput);
+        console.log($state.snapshot(controlInput));
     }
 </script>
 
