@@ -3,11 +3,12 @@
 package main
 
 import (
-	"syscall/js"
+	"fmt"
 )
 
 func main() {
 	ch := make(chan struct{})
-	js.Global().Set("runCalculation", js.FuncOf(Run))
+	//js.Global().Set("runCalculation", js.FuncOf(Run))
+	fmt.Println("Hello from WASM!")
 	<-ch
 }
