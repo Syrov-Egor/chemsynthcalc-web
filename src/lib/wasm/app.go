@@ -26,7 +26,7 @@ type CalculationParams struct {
 	Intify          bool    `json:"intify"`
 	OutputPrecision int     `json:"outputPrecision"`
 	FloatTolerance  int     `json:"floatTolerance"`
-	MaxComb         int     `json:"maxComb"`
+	MaxComb         int     `json:"maxCombinations"`
 	Equation        string  `json:"equation"`
 }
 
@@ -72,8 +72,12 @@ func getParams(args []js.Value) (CalculationParams, error) {
 }
 
 func calculate(data CalculationParams) (string, error) {
-	app := NewApp()
-	res := app.PerformCalculation(data)
+	// Use the global currentApp instance
+	if currentApp == nil {
+		return "", fmt.Errorf("app not initialized")
+	}
+
+	res := currentApp.PerformCalculation(data)
 	jsonData, err := json.Marshal(res)
 	if err != nil {
 		fmt.Println("Error marshalling:", err)
@@ -95,6 +99,7 @@ func (a *App) StopCalculation() {
 	defer a.cancelMutex.Unlock()
 
 	if a.cancelFunc != nil {
+		fmt.Println("Cancelling calculation...")
 		a.cancelFunc()
 	}
 }
@@ -107,6 +112,17 @@ func (a *App) IsCalculating() bool {
 
 func (a *App) PerformCalculation(params CalculationParams) CalculationResult {
 	a.cancelMutex.Lock()
+
+	// If already calculating, return error
+	if a.isCalculating {
+		a.cancelMutex.Unlock()
+		return CalculationResult{
+			Success: false,
+			Message: "Another calculation is already in progress",
+			Details: "",
+		}
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	a.cancelFunc = cancel
 	a.isCalculating = true

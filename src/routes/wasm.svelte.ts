@@ -1,75 +1,174 @@
-import '$lib/wasm_exec_tiny'
-import wasm from '$lib/main.wasm?url'
+type WorkerMessage = 
+    | { type: 'init' }
+    | { type: 'calculate', params: any }
+    | { type: 'abort' }
 
-declare global {
-    export interface Window {
-        Go: {
-            new (): {
-                run: (inst: WebAssembly.Instance) => Promise<void>
-                importObject: WebAssembly.Imports
-            }
-        }
-        InitFinaplan: (
-            intervalType: string,
-            intervalLength: number,
-            intervalAmount: number
-        ) => Finaplan
+type WorkerResponse =
+    | { type: 'ready' }
+    | { type: 'result', result: string }
+    | { type: 'error', error: string }
+
+class WasmManager {
+    private worker: Worker | null = null
+    private loaded = $state(false)
+    private loading = $state(false)
+    private messageHandlers: Map<string, (data: any) => void> = new Map()
+    private currentCalculation: { 
+        resolve: (result: string) => void, 
+        reject: (error: Error) => void 
+    } | null = null
+
+    get isLoaded() {
+        return this.loaded
     }
-}
 
-interface FinaplanResult<T> {
-    result?: T
-    error?: string
-}
+    get isLoading() {
+        return this.loading
+    }
 
-export interface Finaplan {
-    add: (amount: string, each: number, start: number) => FinaplanResult<void>
-    invest: (
-        interest: string,
-        interval: number,
-        start: number,
-        compound: boolean
-    ) => FinaplanResult<void>
-    inflation: (inflation: string, intervals: number) => FinaplanResult<void>
-    print: () => FinaplanResult<number[]>
-}
+    async load() {
+        if (this.loaded || this.loading) {
+            return
+        }
 
-const until = (f: () => boolean): Promise<void> => {
-    return new Promise(resolve => {
-        const intervalCode = setInterval(() => {
-            if (f()) {
+        this.loading = true
+
+        try {
+            console.log('Creating Web Worker for WASM...')
+            
+            // Create the worker
+            this.worker = new Worker(
+                new URL('./wasm.worker.ts', import.meta.url),
+                { type: 'module' }
+            )
+
+            // Set up message handler
+            this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+                const response = event.data
+                
+                // Call any registered handlers
+                const handler = this.messageHandlers.get(response.type)
+                if (handler) {
+                    handler(response)
+                }
+            }
+
+            this.worker.onerror = (error) => {
+                console.error('Worker error:', error)
+                if (this.currentCalculation) {
+                    this.currentCalculation.reject(new Error(`Worker error: ${error.message}`))
+                    this.currentCalculation = null
+                }
+            }
+
+            // Initialize the worker and wait for it to be ready
+            await this.initWorker()
+
+            this.loaded = true
+            console.log('Web Worker initialized and ready')
+        } catch (error) {
+            console.error('Failed to initialize Web Worker:', error)
+            throw error
+        } finally {
+            this.loading = false
+        }
+    }
+
+    private initWorker(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                reject(new Error('Worker initialization timeout'))
+            }, 10000)
+
+            this.messageHandlers.set('ready', () => {
+                clearTimeout(timeout)
+                this.messageHandlers.delete('ready')
                 resolve()
-                clearInterval(intervalCode)
-            }
-        }, 10)
-    })
-}
+            })
 
-export async function loadFinaplan() {
-    if (!WebAssembly.instantiateStreaming) {
-        // polyfill
-        WebAssembly.instantiateStreaming = async (resp, importObject) => {
-            const source = await (await resp).arrayBuffer()
-            return await WebAssembly.instantiate(source, importObject)
+            this.worker?.postMessage({ type: 'init' } as WorkerMessage)
+        })
+    }
+
+    async calculate(params: any): Promise<string> {
+        // If we have a current calculation, reject it first
+        if (this.currentCalculation) {
+            this.currentCalculation.reject(new Error('New calculation started before previous completed'))
+            this.currentCalculation = null
+        }
+
+        if (!this.loaded) {
+            await this.load()
+        }
+
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                if (this.currentCalculation) {
+                    this.currentCalculation.reject(new Error('Calculation timeout'))
+                    this.currentCalculation = null
+                }
+            }, 300000) // 5 minute timeout
+
+            this.currentCalculation = { resolve, reject }
+
+            const resultHandler = (response: WorkerResponse) => {
+                clearTimeout(timeout)
+                this.messageHandlers.delete('result')
+                this.messageHandlers.delete('error')
+                this.currentCalculation = null
+                
+                if (response.type === 'result') {
+                    resolve(response.result)
+                }
+            }
+
+            const errorHandler = (response: WorkerResponse) => {
+                clearTimeout(timeout)
+                this.messageHandlers.delete('result')
+                this.messageHandlers.delete('error')
+                this.currentCalculation = null
+                
+                if (response.type === 'error') {
+                    reject(new Error(response.error))
+                }
+            }
+
+            this.messageHandlers.set('result', resultHandler)
+            this.messageHandlers.set('error', errorHandler)
+
+            this.worker?.postMessage({ 
+                type: 'calculate', 
+                params 
+            } as WorkerMessage)
+        })
+    }
+
+    abort() {
+        // Terminate the entire worker to ensure WASM stops completely
+        this.terminate()
+        
+        // Reject the current calculation
+        if (this.currentCalculation) {
+            this.currentCalculation.reject(new Error('Calculation aborted by user'))
+            this.currentCalculation = null
+        }
+        
+        console.log('Worker terminated due to abort')
+    }
+
+    terminate() {
+        if (this.worker) {
+            this.worker.terminate()
+            this.worker = null
+            this.loaded = false
+            this.loading = false
         }
     }
 
-    console.log('Loading WebAssembly')
-
-    if (!WebAssembly) {
-        throw new Error('WebAssembly is not supported in your browser')
+    // Add a method to check if we can calculate
+    canCalculate(): boolean {
+        return !this.loading && !this.currentCalculation
     }
-    const go = new window.Go()
-    const result = await WebAssembly.instantiateStreaming(
-        fetch(wasm),
-        go.importObject
-    )
-
-    console.log('Loaded WebAssembly')
-
-    go.run(result.instance)
-
-    // wait until WASM create the function
-    await until(() => window.InitFinaplan != undefined)
-    return window.InitFinaplan
 }
+
+export const wasmManager = new WasmManager()

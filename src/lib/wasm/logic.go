@@ -118,26 +118,43 @@ func calcBalanceMode(ctx context.Context, params *CalculationParams) Calculation
 		calcResult = auto.Result
 		method = auto.Method
 	case "inv":
+		select {
+		case <-ctx.Done():
+			return CalculationResult{Success: false, Message: "Calculation cancelled", Details: "", Cancelled: true}
+		default:
+		}
+
 		calcResult, err = bal.Inv()
 		if err != nil {
 			return errorousCalculation(err.Error())
 		}
 		method = "Inv"
 	case "gpinv":
+		select {
+		case <-ctx.Done():
+			return CalculationResult{Success: false, Message: "Calculation cancelled", Details: "", Cancelled: true}
+		default:
+		}
+
 		calcResult, err = bal.GPinv()
 		if err != nil {
 			return errorousCalculation(err.Error())
 		}
 		method = "GPinv"
 	case "ppinv":
+		select {
+		case <-ctx.Done():
+			return CalculationResult{Success: false, Message: "Calculation cancelled", Details: "", Cancelled: true}
+		default:
+		}
+
 		calcResult, err = bal.PPinv()
 		if err != nil {
 			return errorousCalculation(err.Error())
 		}
 		method = "PPinv"
 	case "comb":
-		// For the long-running comb algorithm, we need to run it in a goroutine
-		// and check for cancellation
+		// This already handles context properly
 		resultChan := make(chan []float64, 1)
 		errorChan := make(chan error, 1)
 
@@ -150,7 +167,6 @@ func calcBalanceMode(ctx context.Context, params *CalculationParams) Calculation
 			resultChan <- result
 		}()
 
-		// Wait for either result or cancellation
 		select {
 		case <-ctx.Done():
 			return CalculationResult{Success: false, Message: "Calculation cancelled", Details: "", Cancelled: true}
@@ -162,7 +178,6 @@ func calcBalanceMode(ctx context.Context, params *CalculationParams) Calculation
 		}
 	}
 
-	// Check for cancellation before final processing
 	select {
 	case <-ctx.Done():
 		return CalculationResult{Success: false, Message: "Calculation cancelled", Details: "", Cancelled: true}
