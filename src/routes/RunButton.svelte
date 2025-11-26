@@ -4,20 +4,10 @@
     import { wasmManager } from "./wasm.svelte";
 
     function onClickButtonRun() {
-        // If we're in a stuck state, force reset
-        if (calculationManager.isCalculating && !wasmManager.canCalculate()) {
-            console.log("Force resetting calculation manager...");
-            calculationManager.reset();
-            // Small delay to ensure reset completes
-            setTimeout(() => {
-                calculationManager.run(controlInput, textInput);
-            }, 100);
-        } else {
-            calculationManager.run(controlInput, textInput);
-        }
+        calculationManager.run(controlInput, textInput);
     }
 
-    // Reset when component is destroyed
+    // Cleanup on destroy if needed
     $effect(() => {
         return () => {
             if (calculationManager.isCalculating) {
