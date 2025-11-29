@@ -31,15 +31,3 @@
         <span class="loading-indicator">(Loading WASM...)</span>
     {/if}
 </button>
-
-<style>
-    .loading-indicator {
-        font-size: 0.8em;
-        opacity: 0.7;
-    }
-
-    button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-</style>

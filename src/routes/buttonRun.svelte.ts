@@ -2,6 +2,8 @@ import { wasmManager } from "./wasm.svelte";
 
 class CalculationManager {
     public isCalculating = $state(false)
+    public parsedResult = $state<any | null>(null)
+    public calculationError = $state<string | null>(null)
     private shouldAbort = $state(false)
 
     async run(controlInput: object, textInput: string) {
@@ -16,6 +18,8 @@ class CalculationManager {
         // Reset state
         this.shouldAbort = false
         this.isCalculating = true
+        this.parsedResult = null
+        this.calculationError = null
 
         try {
             // Merge inputs
@@ -37,34 +41,41 @@ class CalculationManager {
 
             console.log('Calculation result:', result)
 
-            // Parse and display result
+            // Parse and store result
             try {
                 const parsed = JSON.parse(result)
+                this.calculationError = null
                 if (parsed.cancelled) {
                     console.log('⚠ Calculation was cancelled')
+                    this.parsedResult = null
                 } else if (parsed.success) {
                     console.log('✓ Calculation successful')
                     console.log('Details:', parsed.details)
                     if (parsed.tabular && parsed.tabular.length > 0) {
                         console.table(parsed.tabular)
                     }
+                    this.parsedResult = parsed
                 } else {
                     console.error('✗ Calculation failed:', parsed.message)
                     if (parsed.details) {
                         console.error('Error details:', parsed.details)
                     }
+                    this.parsedResult = null
+                    this.calculationError = parsed.message || 'Calculation failed'
                 }
             } catch (e) {
+                console.error('Parse error:', e)
                 console.log('Raw result:', result)
+                this.parsedResult = null
+                this.calculationError = 'Invalid result format'
             }
 
         } catch (error) {
             if (this.shouldAbort) {
                 console.log('Calculation aborted as requested')
-            } else if (error instanceof Error) {
-                console.error('Calculation error:', error.message)
             } else {
-                console.error('Calculation error:', error)
+                this.calculationError = error instanceof Error ? error.message : String(error)
+                console.error('Calculation error:', this.calculationError)
             }
         } finally {
             this.isCalculating = false
@@ -80,6 +91,8 @@ class CalculationManager {
     // Reset the manager state
     reset() {
         this.isCalculating = false
+        this.parsedResult = null
+        this.calculationError = null
         this.shouldAbort = false
         wasmManager.terminate()
     }
