@@ -25,7 +25,7 @@
     disabled={wasmManager.isLoading}
 >
     <span id="button-text">
-        {calculationManager.isCalculating ? "Abort" : "Run Calculation"}
+        {calculationManager.isCalculating ? "Stop" : "Run Calculation"}
     </span>
     {#if wasmManager.isLoading}
         <span class="loading-indicator">(Loading WASM...)</span>
