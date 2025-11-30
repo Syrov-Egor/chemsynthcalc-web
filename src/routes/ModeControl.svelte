@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { Radio } from "flowbite-svelte";
+
     import Algorithm from "./Algorithm.svelte";
     import RunMode from "./RunMode.svelte";
     import TargetNumber from "./TargetNumber.svelte";
@@ -33,18 +35,9 @@
     });
 </script>
 
-<fieldset id="modes">
-    <legend>Mode</legend>
-    <label>
-        <input type="radio" bind:group={mode} value="formula" /> Formula
-    </label>
-    <label>
-        <input type="radio" bind:group={mode} value="balance" /> Balance
-    </label>
-    <label>
-        <input type="radio" bind:group={mode} value="masses" /> Masses
-    </label>
-</fieldset>
+<Radio name="modes" value="formula" bind:group={mode}>Formula</Radio>
+<Radio name="modes" value="balance" bind:group={mode}>Balance</Radio>
+<Radio name="modes" value="masses" bind:group={mode}>Masses</Radio>
 
 <Algorithm {mode} bind:algorithm />
 <RunMode {mode} bind:runMode />
