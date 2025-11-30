@@ -19,17 +19,17 @@
     });
 </script>
 
-<button
-    type="button"
+<Button
     id="run-button"
     onclick={onClickButtonRun}
-    class:calculating={calculationManager.isCalculating}
+    color={calculationManager.isCalculating ? "yellow" : "green"}
+    class={calculationManager.isCalculating ? "calculating" : ""}
     disabled={wasmManager.isLoading}
 >
     <span id="button-text">
-        {calculationManager.isCalculating ? "Stop" : "Run Calculation"}
+        {calculationManager.isCalculating ? "Stop" : "Run"}
     </span>
     {#if wasmManager.isLoading}
         <span class="loading-indicator">(Loading WASM...)</span>
     {/if}
-</button>
+</Button>
