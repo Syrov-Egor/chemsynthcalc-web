@@ -1,8 +1,16 @@
 <script lang="ts">
+    import { Input, Label } from "flowbite-svelte";
     import { inputPlaceholder } from "./scripts/inputPlaceholder.svelte";
+
     let { textInput = $bindable() } = $props();
     let placeholder = inputPlaceholder();
 </script>
 
-<label for="equation-input">Input</label>
-<input type="text" id="equation-input" {placeholder} bind:value={textInput} />
+<Label for="equation-input">Input</Label>
+<Input
+    type="text"
+    id="equation-input"
+    {placeholder}
+    bind:value={textInput}
+    clearable
+/>
