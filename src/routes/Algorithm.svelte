@@ -15,5 +15,5 @@
 
 <Label>
     Algorithm
-    <Select items={algos} bind:value={algorithm} {disabled} />
+    <Select items={algos} bind:value={algorithm} {disabled} placeholder="" />
 </Label>
