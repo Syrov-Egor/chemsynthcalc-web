@@ -1,13 +1,19 @@
 <script lang="ts">
+    import { Select, Label } from "flowbite-svelte";
+
     let { mode, algorithm = $bindable() } = $props();
     let disabled = $derived(mode === "formula" || mode === "masses");
+
+    let algos = [
+        { value: "auto", name: "Auto" },
+        { value: "inv", name: "Inv" },
+        { value: "gpinv", name: "GPinv" },
+        { value: "ppinv", name: "PPinv" },
+        { value: "comb", name: "Comb" },
+    ];
 </script>
 
-<label for="algorithm">Algorithm</label>
-<select id="algorithm" {disabled} bind:value={algorithm}>
-    <option value="auto">Auto</option>
-    <option value="inv">Inv</option>
-    <option value="gpinv">GPinv</option>
-    <option value="ppinv">PPinv</option>
-    <option value="comb">Comb</option>
-</select>
+<Label>
+    Algorithm
+    <Select items={algos} bind:value={algorithm} {disabled} />
+</Label>
