@@ -1,7 +1,9 @@
 <script lang="ts">
+    import { Input, Label } from "flowbite-svelte";
+
     let { mode, targetNumber = $bindable() } = $props();
     let disabled = $derived(mode === "formula" || mode === "balance");
 </script>
 
-<label for="target-num">Target #</label>
-<input type="number" id="target-num" bind:value={targetNumber} {disabled} />
+<Label for="target-num">Target #</Label>
+<Input type="number" id="target-num" bind:value={targetNumber} {disabled} />
