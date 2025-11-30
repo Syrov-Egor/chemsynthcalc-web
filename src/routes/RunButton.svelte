@@ -1,7 +1,10 @@
 <script lang="ts">
-    let { controlInput, textInput } = $props();
+    import { Button } from "flowbite-svelte";
+
     import { calculationManager } from "./scripts/buttonRun.svelte";
     import { wasmManager } from "./scripts/wasm.svelte";
+
+    let { controlInput, textInput } = $props();
 
     function onClickButtonRun() {
         calculationManager.run(controlInput, textInput);
