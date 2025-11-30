@@ -1,13 +1,12 @@
 <script lang="ts">
     let { controlInput, textInput } = $props();
-    import { calculationManager } from "./buttonRun.svelte";
-    import { wasmManager } from "./wasm.svelte";
+    import { calculationManager } from "./scripts/buttonRun.svelte";
+    import { wasmManager } from "./scripts/wasm.svelte";
 
     function onClickButtonRun() {
         calculationManager.run(controlInput, textInput);
     }
 
-    // Cleanup on destroy if needed
     $effect(() => {
         return () => {
             if (calculationManager.isCalculating) {

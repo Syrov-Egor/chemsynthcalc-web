@@ -2,8 +2,6 @@ import wasmExec from '$lib/wasm_exec_tiny?raw'
 import wasmUrl from '$lib/main.wasm?url'
 
 let isCalculating = false
-let currentGoInstance: any = null
-let currentCalculationAbortController: AbortController | null = null;
 
 declare global {
     interface Window {
