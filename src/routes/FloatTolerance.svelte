@@ -1,10 +1,12 @@
 <script lang="ts">
+    import { Input, Label } from "flowbite-svelte";
+
     let { mode, floatTolerance = $bindable() } = $props();
     let disabled = $derived(mode === "formula");
 </script>
 
-<label for="float-tolerance">Float Tolerance (1e-x)</label>
-<input
+<Label for="float-tolerance">Float Tolerance (1e-x)</Label>
+<Input
     type="number"
     id="float-tolerance"
     bind:value={floatTolerance}

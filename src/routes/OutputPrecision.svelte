@@ -1,10 +1,12 @@
 <script lang="ts">
+    import { Input, Label } from "flowbite-svelte";
+
     let { mode, outputPrecision = $bindable() } = $props();
     let disabled = $derived(mode === "balance");
 </script>
 
-<label for="output-precision">Output Precision</label>
-<input
+<Label for="output-precision">Output Precision</Label>
+<Input
     type="number"
     id="output-precision"
     bind:value={outputPrecision}

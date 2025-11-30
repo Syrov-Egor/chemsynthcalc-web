@@ -1,10 +1,12 @@
 <script lang="ts">
+    import { Input, Label } from "flowbite-svelte";
+
     let { mode, maxCombinations = $bindable() } = $props();
     let disabled = $derived(mode === "formula" || mode === "masses");
 </script>
 
-<label for="max-comb">Max Combinations</label>
-<input
+<Label for="max-comb">Max coefficient</Label>
+<Input
     type="number"
     id="max-comb"
     bind:value={maxCombinations}
