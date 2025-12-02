@@ -1,4 +1,4 @@
-type WorkerMessage = 
+type WorkerMessage =
     | { type: 'init' }
     | { type: 'calculate', params: any }
     | { type: 'abort' }
@@ -13,9 +13,9 @@ class WasmManager {
     private loaded = $state(false)
     private loading = $state(false)
     private messageHandlers: Map<string, (data: any) => void> = new Map()
-    private currentCalculation: { 
-        resolve: (result: string) => void, 
-        reject: (error: Error) => void 
+    private currentCalculation: {
+        resolve: (result: string) => void,
+        reject: (error: Error) => void
     } | null = null
 
     get isLoaded() {
@@ -35,7 +35,7 @@ class WasmManager {
 
         try {
             console.log('Creating Web Worker for WASM...')
-            
+
             // Create the worker
             this.worker = new Worker(
                 new URL('./wasm.worker.ts', import.meta.url),
@@ -45,7 +45,7 @@ class WasmManager {
             // Set up message handler
             this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
                 const response = event.data
-                
+
                 // Call any registered handlers
                 const handler = this.messageHandlers.get(response.type)
                 if (handler) {
@@ -78,7 +78,7 @@ class WasmManager {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
                 reject(new Error('Worker initialization timeout'))
-            }, 10000)
+            }, 120000)
 
             this.messageHandlers.set('ready', () => {
                 clearTimeout(timeout)
@@ -107,7 +107,7 @@ class WasmManager {
                     this.currentCalculation.reject(new Error('Calculation timeout'))
                     this.currentCalculation = null
                 }
-            }, 300000) // 5 minute timeout
+            }, 3000000)
 
             this.currentCalculation = { resolve, reject }
 
@@ -116,7 +116,7 @@ class WasmManager {
                 this.messageHandlers.delete('result')
                 this.messageHandlers.delete('error')
                 this.currentCalculation = null
-                
+
                 if (response.type === 'result') {
                     resolve(response.result)
                 }
@@ -127,7 +127,7 @@ class WasmManager {
                 this.messageHandlers.delete('result')
                 this.messageHandlers.delete('error')
                 this.currentCalculation = null
-                
+
                 if (response.type === 'error') {
                     reject(new Error(response.error))
                 }
@@ -136,9 +136,9 @@ class WasmManager {
             this.messageHandlers.set('result', resultHandler)
             this.messageHandlers.set('error', errorHandler)
 
-            this.worker?.postMessage({ 
-                type: 'calculate', 
-                params 
+            this.worker?.postMessage({
+                type: 'calculate',
+                params
             } as WorkerMessage)
         })
     }
@@ -146,13 +146,13 @@ class WasmManager {
     abort() {
         // Terminate the entire worker to ensure WASM stops completely
         this.terminate()
-        
+
         // Reject the current calculation
         if (this.currentCalculation) {
             this.currentCalculation.reject(new Error('Calculation aborted by user'))
             this.currentCalculation = null
         }
-        
+
         console.log('Worker terminated due to abort')
     }
 
