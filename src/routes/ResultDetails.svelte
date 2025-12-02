@@ -1,11 +1,13 @@
 <script lang="ts">
     import { prettyPrint } from "./scripts/pPrint.svelte";
 
-    let { parsedResult } = $props();
+    let { parsedResult, mode = $bindable() } = $props();
+
+    let isOpen = $derived(mode === "formula" || mode === "balance");
 </script>
 
 {#if parsedResult?.details}
-    <details>
+    <details open={isOpen}>
         <summary>Details</summary>
         <pre>{prettyPrint(parsedResult.details)}</pre>
     </details>

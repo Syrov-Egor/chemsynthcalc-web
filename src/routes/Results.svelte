@@ -2,6 +2,9 @@
     import { calculationManager } from "./scripts/buttonRun.svelte";
     import ResultDetails from "./ResultDetails.svelte";
     import ResultTable from "./ResultTable.svelte";
+
+    let { controlInput } = $props();
+    let mode = $derived(controlInput.mode);
 </script>
 
 <div id="results-section">
@@ -18,6 +21,7 @@
                 <div id="status-text">
                     <ResultDetails
                         parsedResult={calculationManager.parsedResult}
+                        {mode}
                     />
                     <ResultTable
                         parsedResult={calculationManager.parsedResult}
