@@ -12,7 +12,7 @@
 </div>
 
 <Label for="input-group">Input</Label>
-<div id="input-group" class="flex gap-1 py-2">
+<div id="input-group" class="flex flex-col md:flex-row gap-1 py-2 w-full">
     <EquationInput bind:textInput />
     <RunButton {controlInput} {textInput} />
 </div>
