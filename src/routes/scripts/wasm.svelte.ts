@@ -34,8 +34,6 @@ class WasmManager {
         this.loading = true
 
         try {
-            console.log('Creating Web Worker for WASM...')
-
             // Create the worker
             this.worker = new Worker(
                 new URL('./wasm.worker.ts', import.meta.url),
@@ -65,7 +63,6 @@ class WasmManager {
             await this.initWorker()
 
             this.loaded = true
-            console.log('Web Worker initialized and ready')
         } catch (error) {
             console.error('Failed to initialize Web Worker:', error)
             throw error
@@ -152,8 +149,6 @@ class WasmManager {
             this.currentCalculation.reject(new Error('Calculation aborted by user'))
             this.currentCalculation = null
         }
-
-        console.log('Worker terminated due to abort')
     }
 
     terminate() {

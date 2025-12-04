@@ -60,7 +60,6 @@ async function initWasm() {
         await waitForFunction('runCalculation', 5000)
 
         wasmLoaded = true
-        console.log('[Worker] WASM loaded and ready')
     } catch (error) {
         console.error('[Worker] Failed to initialize WASM:', error)
         throw error
@@ -110,7 +109,6 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                 isCalculating = true
 
                 try {
-                    console.log('[Worker] Starting calculation...')
                     const runCalculation = (self as any).runCalculation
 
                     if (!runCalculation) {
@@ -118,8 +116,6 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                     }
 
                     const result = runCalculation(message.params)
-                    console.log('[Worker] Calculation complete')
-
                     self.postMessage({
                         type: 'result',
                         result: result
@@ -136,8 +132,6 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                 break
 
             case 'abort':
-                console.log('[Worker] Abort requested - terminating worker')
-
                 // Terminate the entire worker to ensure complete cleanup
                 const stopCalculation = (self as any).stopCalculation
                 if (stopCalculation) {
