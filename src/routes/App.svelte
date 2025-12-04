@@ -18,7 +18,7 @@
     });
 </script>
 
-<div class="p-4">
+<div class="p-4 dark:bg-gray-900">
     <DarkMode />
     <InputGroup bind:textInput bind:controlInput />
     <Results {controlInput} />

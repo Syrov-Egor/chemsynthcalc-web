@@ -9,10 +9,12 @@
 </script>
 
 {#if parsedResult?.details}
-    <details open={isOpen}>
-        <summary>Details</summary>
-        <pre>{prettyPrint(parsedResult.details)}</pre>
-    </details>
+    <P size="base" weight="semibold" class="pb-4"
+        ><details open={isOpen}>
+            <summary>Details</summary>
+            <pre>{prettyPrint(parsedResult.details)}</pre>
+        </details></P
+    >
 {/if}
 
 <style>

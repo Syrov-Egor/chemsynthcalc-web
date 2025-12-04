@@ -1,6 +1,7 @@
 <script lang="ts">
     let { parsedResult } = $props();
     import {
+        P,
         Table,
         TableBody,
         TableBodyCell,
@@ -15,15 +16,19 @@
         class="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-round"
     >
         <TableHead>
-            <TableHeadCell>Formula</TableHeadCell>
-            <TableHeadCell>Molar mass (g/mol)</TableHeadCell>
-            <TableHeadCell>Mass (g)</TableHeadCell>
+            <TableHeadCell><P weight="semibold">Formula</P></TableHeadCell>
+            <TableHeadCell
+                ><P weight="semibold">Molar mass (g/mol)</P></TableHeadCell
+            >
+            <TableHeadCell><P weight="semibold">Mass (g)</P></TableHeadCell>
         </TableHead>
         <TableBody>
             {#each parsedResult.tabular as row, i (i)}
                 <TableBodyRow>
                     {#each Object.values(row) as value, j (j)}
-                        <TableBodyCell>{value}</TableBodyCell>
+                        <TableBodyCell
+                            ><P weight="semibold">{value}</P></TableBodyCell
+                        >
                     {/each}
                 </TableBodyRow>
             {/each}

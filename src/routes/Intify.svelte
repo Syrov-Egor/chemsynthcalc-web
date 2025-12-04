@@ -5,6 +5,10 @@
     let disabled = $derived(mode === "formula");
 </script>
 
-<Toggle id="intify-toggle" bind:checked={intify} {disabled}
-    >Intify coefficients</Toggle
+<Toggle
+    color="teal"
+    size="large"
+    id="intify-toggle"
+    bind:checked={intify}
+    {disabled}>Intify coefficients</Toggle
 >
