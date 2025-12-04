@@ -22,7 +22,7 @@
 <Button
     id="run-button"
     onclick={onClickButtonRun}
-    color={calculationManager.isCalculating ? "yellow" : "green"}
+    color={calculationManager.isCalculating ? "red" : "green"}
     class={calculationManager.isCalculating ? "calculating" : ""}
     disabled={wasmManager.isLoading}
 >

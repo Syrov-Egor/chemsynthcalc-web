@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DarkMode } from "flowbite-svelte";
+    import TopNavBar from "./TopNavBar.svelte";
     import InputGroup from "./InputGroup.svelte";
     import Results from "./Results.svelte";
 
@@ -19,7 +19,7 @@
 </script>
 
 <div class="p-4 dark:bg-gray-900">
-    <DarkMode />
+    <TopNavBar />
     <InputGroup bind:textInput bind:controlInput />
     <Results {controlInput} />
 </div>

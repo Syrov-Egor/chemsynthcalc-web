@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { Toggle, Label } from "flowbite-svelte";
+    import { Toggle } from "flowbite-svelte";
 
     let { mode, intify = $bindable() } = $props();
     let disabled = $derived(mode === "formula");
 </script>
 
 <Toggle
-    color="teal"
+    color="emerald"
     size="large"
     id="intify-toggle"
     bind:checked={intify}

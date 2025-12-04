@@ -2,7 +2,7 @@
     import { calculationManager } from "./scripts/buttonRun.svelte";
     import ResultDetails from "./ResultDetails.svelte";
     import ResultTable from "./ResultTable.svelte";
-    import { Heading } from "flowbite-svelte";
+    import { Heading, P, Spinner } from "flowbite-svelte";
 
     let { controlInput } = $props();
     let mode = $derived(controlInput.mode);
@@ -13,10 +13,14 @@
         <Heading tag="h5">Results</Heading>
         <div>
             {#if calculationManager.isCalculating}
-                <span id="status-text" class="calculating">Calculating...</span>
+                <span id="status-text" class="calculating"
+                    ><Spinner type="dots" color="emerald" /></span
+                >
             {:else if calculationManager.calculationError}
-                <span id="status-text" class="error"
-                    >Error: {calculationManager.calculationError}</span
+                <P class="text-red-700 dark:text-red-500 py-2" size="lg"
+                    ><span id="status-text" class="error"
+                        >Error: {calculationManager.calculationError}</span
+                    ></P
                 >
             {:else if calculationManager.parsedResult}
                 <div id="status-text">
@@ -29,7 +33,7 @@
                     />
                 </div>
             {:else}
-                <span id="status-text">Ready</span>
+                <P class="py-2"><span id="status-text">Ready</span></P>
             {/if}
         </div>
     </div>
