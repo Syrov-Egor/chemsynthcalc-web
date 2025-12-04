@@ -13,7 +13,7 @@
     ];
 </script>
 
-<Label>
+<Label class="flex flex-col">
     Algorithm
     <Select items={algos} bind:value={algorithm} {disabled} placeholder="" />
 </Label>

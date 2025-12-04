@@ -18,6 +18,8 @@
     });
 </script>
 
-<DarkMode />
-<InputGroup bind:textInput bind:controlInput />
-<Results {controlInput} />
+<div class="p-4">
+    <DarkMode />
+    <InputGroup bind:textInput bind:controlInput />
+    <Results {controlInput} />
+</div>

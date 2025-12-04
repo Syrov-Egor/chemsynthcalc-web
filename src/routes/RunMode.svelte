@@ -11,7 +11,7 @@
     ];
 </script>
 
-<Label>
+<Label class="flex flex-col">
     Run mode
     <Select items={runModes} bind:value={runMode} {disabled} placeholder="" />
 </Label>

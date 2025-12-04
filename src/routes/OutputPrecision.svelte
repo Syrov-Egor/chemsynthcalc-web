@@ -5,12 +5,14 @@
     let disabled = $derived(mode === "balance");
 </script>
 
-<Label for="output-precision">Output Precision</Label>
-<Input
-    type="number"
-    id="output-precision"
-    bind:value={outputPrecision}
-    min="0"
-    max="20"
-    {disabled}
-/>
+<div class="flex flex-col">
+    <Label for="output-precision">Output Precision</Label>
+    <Input
+        type="number"
+        id="output-precision"
+        bind:value={outputPrecision}
+        min="0"
+        max="20"
+        {disabled}
+    />
+</div>

@@ -7,7 +7,7 @@
     let mode = $derived(controlInput.mode);
 </script>
 
-<div id="results-section">
+<div id="results-section" class="py-2">
     <div id="regular-results-header">
         <h3>Results</h3>
         <div>

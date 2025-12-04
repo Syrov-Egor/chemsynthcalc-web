@@ -35,17 +35,21 @@
     });
 </script>
 
-<div>
-    <Radio name="modes" value="formula" bind:group={mode}>Formula</Radio>
-    <Radio name="modes" value="balance" bind:group={mode}>Balance</Radio>
-    <Radio name="modes" value="masses" bind:group={mode}>Masses</Radio>
-</div>
+<div
+    class="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-9 gap-2 items-center p-2"
+>
+    <div class="flex flex-col space-y-1">
+        <Radio name="modes" value="formula" bind:group={mode}>Formula</Radio>
+        <Radio name="modes" value="balance" bind:group={mode}>Balance</Radio>
+        <Radio name="modes" value="masses" bind:group={mode}>Masses</Radio>
+    </div>
 
-<Algorithm {mode} bind:algorithm />
-<RunMode {mode} bind:runMode />
-<TargetNumber {mode} bind:targetNumber />
-<TargetMass {mode} bind:targetMass />
-<Intify {mode} bind:intify />
-<OutputPrecision {mode} bind:outputPrecision />
-<FloatTolerance {mode} bind:floatTolerance />
-<MaxCombinations {mode} bind:maxCombinations />
+    <Algorithm {mode} bind:algorithm />
+    <RunMode {mode} bind:runMode />
+    <TargetNumber {mode} bind:targetNumber />
+    <TargetMass {mode} bind:targetMass />
+    <Intify {mode} bind:intify />
+    <OutputPrecision {mode} bind:outputPrecision />
+    <FloatTolerance {mode} bind:floatTolerance />
+    <MaxCombinations {mode} bind:maxCombinations />
+</div>

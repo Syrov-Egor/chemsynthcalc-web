@@ -5,5 +5,7 @@
     let disabled = $derived(mode === "formula" || mode === "balance");
 </script>
 
-<Label for="target-num">Target #</Label>
-<Input type="number" id="target-num" bind:value={targetNumber} {disabled} />
+<div>
+    <Label for="target-num">Target #</Label>
+    <Input type="number" id="target-num" bind:value={targetNumber} {disabled} />
+</div>
