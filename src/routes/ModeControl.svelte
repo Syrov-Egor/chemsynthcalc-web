@@ -35,9 +35,11 @@
     });
 </script>
 
-<Radio name="modes" value="formula" bind:group={mode}>Formula</Radio>
-<Radio name="modes" value="balance" bind:group={mode}>Balance</Radio>
-<Radio name="modes" value="masses" bind:group={mode}>Masses</Radio>
+<div>
+    <Radio name="modes" value="formula" bind:group={mode}>Formula</Radio>
+    <Radio name="modes" value="balance" bind:group={mode}>Balance</Radio>
+    <Radio name="modes" value="masses" bind:group={mode}>Masses</Radio>
+</div>
 
 <Algorithm {mode} bind:algorithm />
 <RunMode {mode} bind:runMode />

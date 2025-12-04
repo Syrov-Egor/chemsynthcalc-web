@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { Input, Label } from "flowbite-svelte";
+    import { Input } from "flowbite-svelte";
     import { inputPlaceholder } from "./scripts/inputPlaceholder.svelte";
 
     let { textInput = $bindable() } = $props();
     let placeholder = inputPlaceholder();
 </script>
 
-<Label for="equation-input">Input</Label>
 <Input
     type="text"
     id="equation-input"
+    class="placeholder:text-gray-500 placeholder:opacity-50"
     {placeholder}
     bind:value={textInput}
     clearable
