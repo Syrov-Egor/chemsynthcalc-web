@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { P } from "flowbite-svelte";
+
     import { prettyPrint } from "./scripts/pPrint.svelte";
 
     let { parsedResult, mode = $bindable() } = $props();

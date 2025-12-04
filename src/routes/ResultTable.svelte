@@ -1,44 +1,32 @@
 <script lang="ts">
     let { parsedResult } = $props();
+    import {
+        Table,
+        TableBody,
+        TableBodyCell,
+        TableBodyRow,
+        TableHead,
+        TableHeadCell,
+    } from "flowbite-svelte";
 </script>
 
 {#if parsedResult?.tabular && parsedResult.tabular.length > 0}
-    <table class="results-table">
-        <thead>
-            <tr>
-                {#each Object.keys(parsedResult.tabular[0]) as key (key)}
-                    <th>{key}</th>
-                {/each}
-            </tr>
-        </thead>
-        <tbody>
+    <Table
+        class="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-round"
+    >
+        <TableHead>
+            <TableHeadCell>Formula</TableHeadCell>
+            <TableHeadCell>Molar mass (g/mol)</TableHeadCell>
+            <TableHeadCell>Mass (g)</TableHeadCell>
+        </TableHead>
+        <TableBody>
             {#each parsedResult.tabular as row, i (i)}
-                <tr>
+                <TableBodyRow>
                     {#each Object.values(row) as value, j (j)}
-                        <td>{value}</td>
+                        <TableBodyCell>{value}</TableBodyCell>
                     {/each}
-                </tr>
+                </TableBodyRow>
             {/each}
-        </tbody>
-    </table>
+        </TableBody>
+    </Table>
 {/if}
-
-<style>
-    .results-table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-top: 1em;
-    }
-
-    .results-table th,
-    .results-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-
-    .results-table th {
-        background-color: #f2f2f2;
-        font-weight: bold;
-    }
-</style>

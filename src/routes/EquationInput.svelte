@@ -9,6 +9,7 @@
 <Input
     type="text"
     id="equation-input"
+    size="lg"
     class="placeholder:text-gray-500 placeholder:opacity-50"
     {placeholder}
     bind:value={textInput}

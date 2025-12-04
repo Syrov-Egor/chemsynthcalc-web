@@ -2,6 +2,7 @@
     import { calculationManager } from "./scripts/buttonRun.svelte";
     import ResultDetails from "./ResultDetails.svelte";
     import ResultTable from "./ResultTable.svelte";
+    import { Heading } from "flowbite-svelte";
 
     let { controlInput } = $props();
     let mode = $derived(controlInput.mode);
@@ -9,7 +10,7 @@
 
 <div id="results-section" class="py-2">
     <div id="regular-results-header">
-        <h3>Results</h3>
+        <Heading tag="h5">Results</Heading>
         <div>
             {#if calculationManager.isCalculating}
                 <span id="status-text" class="calculating">Calculating...</span>
