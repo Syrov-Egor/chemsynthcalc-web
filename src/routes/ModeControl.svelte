@@ -38,7 +38,7 @@
 <div
     class="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-9 gap-2 items-center p-2"
 >
-    <div class="flex flex-row lg:flex-col space-y-1 gap-2">
+    <div class="flex flex-row lg:flex-col gap-2">
         <Radio name="modes" value="formula" bind:group={mode}>Formula</Radio>
         <Radio name="modes" value="balance" bind:group={mode}>Balance</Radio>
         <Radio name="modes" value="masses" bind:group={mode}>Masses</Radio>
