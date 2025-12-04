@@ -35,9 +35,7 @@
     });
 </script>
 
-<div
-    class="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-9 gap-2 items-center p-2"
->
+<div class="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-9 gap-2 py-2">
     <div class="flex flex-row lg:flex-col gap-2">
         <Radio name="modes" value="formula" bind:group={mode}>Formula</Radio>
         <Radio name="modes" value="balance" bind:group={mode}>Balance</Radio>
