@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"syscall/js"
 )
 
@@ -11,8 +10,6 @@ var currentApp *App
 
 func main() {
 	ch := make(chan struct{})
-
-	fmt.Println("Hello from WASM!")
 
 	currentApp = NewApp()
 
@@ -26,7 +23,6 @@ func main() {
 func StopCalculation(this js.Value, args []js.Value) any {
 	if currentApp != nil {
 		currentApp.StopCalculation()
-		fmt.Println("Calculation stop requested")
 	}
 	return nil
 }
