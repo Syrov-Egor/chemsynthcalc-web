@@ -21,7 +21,7 @@ type CalculationParams struct {
 	Mode            string  `json:"mode"`
 	Algorithm       string  `json:"algorithm"`
 	RunMode         string  `json:"runMode"`
-	TargetNum       int     `json:"targetNum"`
+	TargetNum       int     `json:"targetNumber"`
 	TargetMass      float64 `json:"targetMass"`
 	Intify          bool    `json:"intify"`
 	OutputPrecision int     `json:"outputPrecision"`
