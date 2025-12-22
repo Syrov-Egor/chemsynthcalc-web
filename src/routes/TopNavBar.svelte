@@ -21,7 +21,7 @@
     <NavHamburger />
     <NavUl>
         <NavLi href={wikiLink}><P>How to use</P></NavLi>
-        <NavLi href={downloadLink}><P>Download desktop app</P></NavLi>
+        <NavLi href={downloadLink}><P>Download app</P></NavLi>
         <NavLi href={githubLink}><GithubSolid class="shrink-0 h-7 w-7" /></NavLi
         >
         <NavLi
