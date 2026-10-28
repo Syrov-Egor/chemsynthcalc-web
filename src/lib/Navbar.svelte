@@ -8,6 +8,7 @@
     import { toggleMode } from "mode-watcher";
     import { Button } from "$lib/components/ui/button/index.js";
     import * as Sheet from "$lib/components/ui/sheet/index.js";
+    import { version } from "./../../package.json" with { type: "json" };
 
     const links = [
         {
@@ -37,7 +38,7 @@
 
 <header class="border-b">
     <nav
-        class="mx-auto flex h-14 max-w-5xl items-center justify-between px-4"
+        class="flex h-14 items-center justify-start gap-1 px-4"
         aria-label="Main"
     >
         <!-- Mobile: hamburger + sheet -->
@@ -60,6 +61,13 @@
                         <Sheet.Title>Menu</Sheet.Title>
                     </Sheet.Header>
                     <ul class="flex flex-col gap-1 px-4">
+                        <li>
+                            <span
+                                class="flex h-8 items-center px-2.5 text-sm font-medium text-sidebar-primary"
+                            >
+                                chemsynthcalc v{version}
+                            </span>
+                        </li>
                         {#each links as link (link.href)}
                             <li>
                                 <Button
@@ -80,6 +88,26 @@
                                 </Button>
                             </li>
                         {/each}
+                        <li>
+                            <Button
+                                onclick={toggleMode}
+                                variant="ghost"
+                                class="w-full justify-start"
+                                aria-label="Toggle theme"
+                            >
+                                <span
+                                    class="relative flex size-4 items-center justify-center"
+                                >
+                                    <SunIcon
+                                        class="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
+                                    />
+                                    <MoonIcon
+                                        class="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
+                                    />
+                                </span>
+                                Toggle theme
+                            </Button>
+                        </li>
                     </ul>
                 </Sheet.Content>
             </Sheet.Root>
@@ -87,6 +115,13 @@
 
         <!-- Desktop: inline links -->
         <ul class="hidden items-center gap-1 md:flex">
+            <li>
+                <span
+                    class="flex h-8 items-center px-2.5 text-sm font-medium text-sidebar-primary"
+                >
+                    chemsynthcalc v{version}
+                </span>
+            </li>
             {#each links as link (link.href)}
                 <li>
                     <Button
@@ -102,34 +137,26 @@
                     </Button>
                 </li>
             {/each}
+            <li>
+                <Button
+                    onclick={toggleMode}
+                    variant="ghost"
+                    size="sm"
+                    aria-label="Toggle theme"
+                >
+                    <span
+                        class="relative flex size-4 items-center justify-center"
+                    >
+                        <SunIcon
+                            class="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
+                        />
+                        <MoonIcon
+                            class="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
+                        />
+                    </span>
+                    Toggle theme
+                </Button>
+            </li>
         </ul>
-
-        <!-- Always visible -->
-        <div class="flex items-center gap-1">
-            <Button
-                href="https://github.com/you/repo"
-                target="_blank"
-                rel="noopener noreferrer"
-                variant="ghost"
-                size="icon"
-                aria-label="GitHub"
-            >
-                <GithubIcon class="size-4" />
-            </Button>
-
-            <Button
-                onclick={toggleMode}
-                variant="ghost"
-                size="icon"
-                aria-label="Toggle theme"
-            >
-                <SunIcon
-                    class="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
-                />
-                <MoonIcon
-                    class="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
-                />
-            </Button>
-        </div>
     </nav>
 </header>
