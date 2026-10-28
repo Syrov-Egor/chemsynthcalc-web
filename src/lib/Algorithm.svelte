@@ -10,12 +10,17 @@
         { value: "comb", label: "Comb" },
     ];
 
-    let { algorithm = $bindable("auto") }: { algorithm?: string } = $props();
+    let { algorithm = $bindable() }: { algorithm?: string } = $props();
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
     <Label>Algorithm</Label>
-    <Select.Root type="single" name="Algorithms" items={algos} bind:value={algorithm}>
+    <Select.Root
+        type="single"
+        name="Algorithms"
+        items={algos}
+        bind:value={algorithm}
+    >
         <Select.Trigger class="w-full">
             <Select.Value placeholder="Select an algorithm" />
         </Select.Trigger>

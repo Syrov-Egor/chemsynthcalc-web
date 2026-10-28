@@ -8,12 +8,17 @@
         { value: "force", label: "Force" },
     ];
 
-    let { runMode = $bindable("balance") }: { runMode?: string } = $props();
+    let { runMode = $bindable() }: { runMode?: string } = $props();
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
     <Label>Run Mode</Label>
-    <Select.Root type="single" name="RunModes" items={runModes} bind:value={runMode}>
+    <Select.Root
+        type="single"
+        name="RunModes"
+        items={runModes}
+        bind:value={runMode}
+    >
         <Select.Trigger class="w-full">
             <Select.Value placeholder="Select a run mode" />
         </Select.Trigger>
