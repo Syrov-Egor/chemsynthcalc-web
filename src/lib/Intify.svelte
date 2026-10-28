@@ -5,5 +5,7 @@
 
 <div class="flex flex-col gap-2 w-full min-w-0">
     <Label>Coefs to integers</Label>
-    <Switch size="default" />
+    <div class="flex h-8 w-full items-center">
+        <Switch size="lg" />
+    </div>
 </div>
