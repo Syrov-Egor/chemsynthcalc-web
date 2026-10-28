@@ -1,6 +1,8 @@
 <script lang="ts">
     import { Label } from "$lib/components/ui/label/index.js";
     import * as RadioGroup from "$lib/components/ui/radio-group/index.js";
+
+    let { mode = $bindable() } = $props();
 </script>
 
 <RadioGroup.Root

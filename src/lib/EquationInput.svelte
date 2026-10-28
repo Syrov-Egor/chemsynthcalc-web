@@ -5,20 +5,20 @@
     import { inputPlaceholder } from "./scripts/inputPlaceholder.svelte";
 
     let placeholder = inputPlaceholder();
-    let value = $state("");
+    let { textInput = $bindable() } = $props();
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
     <Label>Input</Label>
     <InputGroup.Root>
-        <InputGroup.Input {placeholder} bind:value />
-        {#if value}
+        <InputGroup.Input {placeholder} bind:value={textInput} />
+        {#if textInput}
             <InputGroup.Addon align="inline-end">
                 <InputGroup.Button
                     variant="ghost"
                     size="icon-xs"
                     aria-label="Clear input"
-                    onclick={() => (value = "")}
+                    onclick={() => (textInput = "")}
                 >
                     <XIcon />
                 </InputGroup.Button>
