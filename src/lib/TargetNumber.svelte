@@ -2,7 +2,7 @@
     import { Label } from "$lib/components/ui/label/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
 
-    let { targetNumber = $bindable(0) }: { targetNumber?: number } = $props();
+    let { targetNumber = $bindable() }: { targetNumber?: number } = $props();
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">

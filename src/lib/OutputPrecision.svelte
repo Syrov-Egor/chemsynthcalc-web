@@ -2,7 +2,7 @@
     import { Label } from "$lib/components/ui/label/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
 
-    let { outputPrecision = $bindable(4) }: { outputPrecision?: number } =
+    let { outputPrecision = $bindable() }: { outputPrecision?: number } =
         $props();
 </script>
 

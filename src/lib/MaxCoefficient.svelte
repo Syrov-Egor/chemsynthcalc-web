@@ -2,7 +2,7 @@
     import { Label } from "$lib/components/ui/label/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
 
-    let { maxCombinations = $bindable(15) }: { maxCombinations?: number } =
+    let { maxCombinations = $bindable() }: { maxCombinations?: number } =
         $props();
 </script>
 

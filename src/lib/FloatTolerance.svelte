@@ -2,7 +2,7 @@
     import { Label } from "$lib/components/ui/label/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
 
-    let { floatTolerance = $bindable(8) }: { floatTolerance?: number } =
+    let { floatTolerance = $bindable() }: { floatTolerance?: number } =
         $props();
 </script>
 
