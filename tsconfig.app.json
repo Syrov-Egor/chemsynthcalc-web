@@ -8,6 +8,14 @@
       "svelte",
       "vite/client"
     ],
+    "paths": {
+      "$lib": [
+        "./src/lib"
+      ],
+      "$lib/*": [
+        "./src/lib/*"
+      ]
+    },
     "allowArbitraryExtensions": true,
     "resolveJsonModule": true,
     "noEmit": true,
