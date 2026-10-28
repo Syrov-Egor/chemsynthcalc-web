@@ -19,9 +19,9 @@
         <RunMode />
         <TargetNumber />
         <TargetMass />
-        <Intify />
         <OutputPrecision />
         <FloatTolerance />
         <MaxCoefficient />
+        <Intify />
     </div>
 </div>
