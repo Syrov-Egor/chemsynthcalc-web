@@ -7,12 +7,13 @@
         { value: "check", label: "Check" },
         { value: "force", label: "Force" },
     ];
-    let value = $state("Balance");
+
+    let { runMode = $bindable("balance") }: { runMode?: string } = $props();
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
     <Label>Run Mode</Label>
-    <Select.Root type="single" name="RunModes" items={runModes} bind:value>
+    <Select.Root type="single" name="RunModes" items={runModes} bind:value={runMode}>
         <Select.Trigger class="w-full">
             <Select.Value placeholder="Select a run mode" />
         </Select.Trigger>
