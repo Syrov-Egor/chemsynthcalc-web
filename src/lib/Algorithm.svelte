@@ -12,7 +12,7 @@
     let value = $state("auto");
 </script>
 
-<div class="flex flex-col gap-2 w-full max-w-sm">
+<div class="flex flex-col gap-2 w-full min-w-0">
     <Label>Algorithm</Label>
     <Select.Root type="single" name="Algorithms" items={algos} bind:value>
         <Select.Trigger class="w-full">

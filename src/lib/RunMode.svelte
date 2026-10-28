@@ -10,7 +10,7 @@
     let value = $state("Balance");
 </script>
 
-<div class="flex flex-col gap-2 w-full max-w-sm">
+<div class="flex flex-col gap-2 w-full min-w-0">
     <Label>Run mode</Label>
     <Select.Root type="single" name="RunModes" items={runModes} bind:value>
         <Select.Trigger class="w-full">
