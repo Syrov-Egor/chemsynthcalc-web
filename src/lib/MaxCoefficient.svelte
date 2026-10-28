@@ -4,6 +4,6 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
-    <Label>MaxCoefficient</Label>
-    <Input id="maxCoefficient" type="number" min={-100} max={100} step={1} />
+    <Label>Max Coefficient</Label>
+    <Input id="max-coefficient" type="number" min={-100} max={100} step={1} />
 </div>

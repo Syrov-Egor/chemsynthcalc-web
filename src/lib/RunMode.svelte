@@ -11,7 +11,7 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
-    <Label>Run mode</Label>
+    <Label>Run Mode</Label>
     <Select.Root type="single" name="RunModes" items={runModes} bind:value>
         <Select.Trigger class="w-full">
             <Select.Value placeholder="Select a run mode" />

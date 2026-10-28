@@ -4,7 +4,7 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
-    <Label>Coefs to integers</Label>
+    <Label>Coefs To Integers</Label>
     <div class="flex h-8 w-full items-center">
         <Switch size="lg" />
     </div>
