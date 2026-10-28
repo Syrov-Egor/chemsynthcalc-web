@@ -4,5 +4,15 @@
       "src/**/*.ts",
       "src/**/*.js",
       "src/**/*.svelte"
-    ]
+    ],
+    "compilerOptions": {
+      "paths": {
+        "$lib": [
+          "./src/lib"
+        ],
+        "$lib/*": [
+          "./src/lib/*"
+        ]
+      }
+    }
   }
