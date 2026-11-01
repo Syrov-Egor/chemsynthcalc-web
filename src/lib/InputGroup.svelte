@@ -1,9 +1,10 @@
 <script lang="ts">
     import Controls from "./Controls.svelte";
     import EquationInput from "./EquationInput.svelte";
+    import Results from "./Results.svelte";
     import RunButton from "./RunButton.svelte";
 
-    let { textInput = $bindable(""), controlInput = $bindable() } = $props();
+    let { textInput = $bindable(), controlInput = $bindable() } = $props();
 </script>
 
 <div class="gap-1 px-6 py-3 border-b">
@@ -15,7 +16,7 @@
             <EquationInput bind:textInput />
         </div>
         <div class="w-full md:w-[11.3%] shrink-0">
-            <RunButton class="w-full" />
+            <RunButton {textInput} {controlInput} class="w-full" />
         </div>
     </div>
 </div>

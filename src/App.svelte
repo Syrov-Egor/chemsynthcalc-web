@@ -5,6 +5,7 @@
 
   import Navbar from "$lib/Navbar.svelte";
   import InputGroup from "$lib/InputGroup.svelte";
+  import Results from "$lib/Results.svelte";
 
   let textInput = $state("");
 
@@ -25,4 +26,5 @@
   <ModeWatcher />
   <Navbar />
   <InputGroup bind:textInput bind:controlInput />
+  <Results {controlInput} />
 </div>
