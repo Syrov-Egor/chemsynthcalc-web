@@ -1,4 +1,4 @@
-import wasmExec from '$lib/wasm/wasm_exec_tiny?raw'
+import wasmExec from '$lib/wasm/wasm_exec?raw'
 import wasmUrl from '$lib/wasm/main.wasm?url'
 
 let isCalculating = false

@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+vars:
+  WASM_PATH: "src/lib/wasm"
+  TINYGOROOT:
+    sh: tinygo env TINYGOROOT
+
+tasks:
+  default:
+    desc: "Task runner for chemsynthcalc-web"
+    cmds:
+      - echo "Task runner for chemsynthcalc-web. To see all of the tasks, run 'task --list'"
+  
+  wasm-exec:
+    desc: "Copy wasm-exec JS glue file into the build dir"
+    cmds:
+      - cp "{{.TINYGOROOT}}/targets/wasm_exec.js" {{.WASM_PATH}}/wasm_exec.js
+
+  wasm-build:
+    desc: "Build go-wasm module with TinyGo compiler (should be in PATH)"
+    dir: "{{.WASM_PATH}}"
+    cmds:
+      - GOOS=js GOARCH=wasm tinygo build -no-debug -tags=noasm,math_big_pure_go -o main.wasm
+
+  wasm-optimize:
+    desc: "Optimize built wasm module with Binaryen wasm-opt utility (should be in PATH)"
+    dir: "{{.WASM_PATH}}"
+    cmds:
+      - wasm-opt main.wasm -Oz -o main.opt.wasm && mv main.opt.wasm main.wasm
