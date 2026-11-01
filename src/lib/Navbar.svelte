@@ -93,7 +93,7 @@
                                 onclick={toggleMode}
                                 variant="ghost"
                                 class="w-full justify-start"
-                                aria-label="Toggle theme"
+                                aria-label="Theme"
                             >
                                 <span
                                     class="relative flex size-4 items-center justify-center"
@@ -105,7 +105,7 @@
                                         class="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
                                     />
                                 </span>
-                                Toggle theme
+                                Theme
                             </Button>
                         </li>
                     </ul>
@@ -142,7 +142,7 @@
                     onclick={toggleMode}
                     variant="ghost"
                     size="sm"
-                    aria-label="Toggle theme"
+                    aria-label="Theme"
                 >
                     <span
                         class="relative flex size-4 items-center justify-center"
@@ -154,7 +154,7 @@
                             class="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
                         />
                     </span>
-                    Toggle theme
+                    Theme
                 </Button>
             </li>
         </ul>

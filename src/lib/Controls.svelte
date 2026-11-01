@@ -10,6 +10,14 @@
     import MaxCoefficient from "./MaxCoefficient.svelte";
 
     let { controlInput = $bindable() } = $props();
+    let fDisabled = $derived(controlInput.mode === "formula");
+    let bDisabled = $derived(controlInput.mode === "balance");
+    let fmDisabled = $derived(
+        controlInput.mode === "formula" || controlInput.mode === "masses",
+    );
+    let fbDisabled = $derived(
+        controlInput.mode === "formula" || controlInput.mode === "balance",
+    );
 </script>
 
 <div
@@ -19,13 +27,31 @@
     <div
         class="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-8 gap-2 py-3 flex-1 min-w-0"
     >
-        <Algorithm bind:algorithm={controlInput.algorithm} />
-        <RunMode bind:runMode={controlInput.runMode} />
-        <TargetNumber bind:targetNumber={controlInput.targetNumber} />
-        <TargetMass bind:targetMass={controlInput.targetMass} />
-        <OutputPrecision bind:outputPrecision={controlInput.outputPrecision} />
-        <FloatTolerance bind:floatTolerance={controlInput.floatTolerance} />
-        <MaxCoefficient bind:maxCombinations={controlInput.maxCombinations} />
-        <Intify bind:intify={controlInput.intify} />
+        <Algorithm
+            disabled={fmDisabled}
+            bind:algorithm={controlInput.algorithm}
+        />
+        <RunMode disabled={fbDisabled} bind:runMode={controlInput.runMode} />
+        <TargetNumber
+            disabled={fbDisabled}
+            bind:targetNumber={controlInput.targetNumber}
+        />
+        <TargetMass
+            disabled={fbDisabled}
+            bind:targetMass={controlInput.targetMass}
+        />
+        <OutputPrecision
+            disabled={bDisabled}
+            bind:outputPrecision={controlInput.outputPrecision}
+        />
+        <FloatTolerance
+            disabled={fDisabled}
+            bind:floatTolerance={controlInput.floatTolerance}
+        />
+        <MaxCoefficient
+            disabled={fmDisabled}
+            bind:maxCombinations={controlInput.maxCombinations}
+        />
+        <Intify disabled={fDisabled} bind:intify={controlInput.intify} />
     </div>
 </div>

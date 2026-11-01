@@ -10,7 +10,10 @@
         { value: "comb", label: "Comb" },
     ];
 
-    let { algorithm = $bindable() }: { algorithm?: string } = $props();
+    let {
+        disabled = false,
+        algorithm = $bindable(),
+    }: { disabled?: boolean; algorithm?: string } = $props();
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
@@ -20,6 +23,7 @@
         name="Algorithms"
         items={algos}
         bind:value={algorithm}
+        {disabled}
     >
         <Select.Trigger class="w-full">
             <Select.Value placeholder="Select an algorithm" />

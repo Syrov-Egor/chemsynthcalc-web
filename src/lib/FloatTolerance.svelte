@@ -2,8 +2,10 @@
     import { Label } from "$lib/components/ui/label/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
 
-    let { floatTolerance = $bindable() }: { floatTolerance?: number } =
-        $props();
+    let {
+        disabled = false,
+        floatTolerance = $bindable(),
+    }: { disabled?: boolean; floatTolerance?: number } = $props();
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
@@ -14,6 +16,7 @@
         min={0}
         max={15}
         step={1}
+        {disabled}
         bind:value={floatTolerance}
     />
 </div>
