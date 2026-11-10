@@ -5,7 +5,8 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command, isPreview }) => ({
+  base: command === "build" || isPreview ? "/chemsynthcalc-web/" : "/",
   plugins: [tailwindcss(), svelte(), visualizer({ open: true })],
   server: { host: '127.0.0.1', port: 5173 },
   resolve: {
@@ -13,4 +14,4 @@ export default defineConfig({
       $lib: path.resolve("./src/lib"),
     },
   },
-});
+}));
