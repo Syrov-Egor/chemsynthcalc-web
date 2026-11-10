@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Label } from "$lib/components/ui/label/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
+    import { TARGET_NUMBER_MAX, TARGET_NUMBER_MIN } from "$lib/scripts/validation";
 
     let {
         disabled = false,
@@ -13,8 +14,8 @@
     <Input
         id="target-number"
         type="number"
-        min={-100}
-        max={100}
+        min={TARGET_NUMBER_MIN}
+        max={TARGET_NUMBER_MAX}
         step={1}
         {disabled}
         bind:value={targetNumber}

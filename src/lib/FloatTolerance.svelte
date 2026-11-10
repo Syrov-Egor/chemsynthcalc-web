@@ -1,6 +1,10 @@
 <script lang="ts">
     import { Label } from "$lib/components/ui/label/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
+    import {
+        FLOAT_TOLERANCE_MAX,
+        FLOAT_TOLERANCE_MIN,
+    } from "$lib/scripts/validation";
 
     let {
         disabled = false,
@@ -17,8 +21,8 @@
     <Input
         id="floatTolerance"
         type="number"
-        min={0}
-        max={15}
+        min={FLOAT_TOLERANCE_MIN}
+        max={FLOAT_TOLERANCE_MAX}
         step={1}
         {disabled}
         bind:value={floatTolerance}

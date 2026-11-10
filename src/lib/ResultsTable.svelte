@@ -1,11 +1,24 @@
 <script lang="ts">
     import * as Table from "$lib/components/ui/table/index.js";
+    import {
+        OUTPUT_PRECISION_MAX,
+        OUTPUT_PRECISION_MIN,
+    } from "$lib/scripts/validation";
 
     let { parsedResult, outputPrecision = 4 } = $props();
 
+    let precision = $derived(
+        typeof outputPrecision === "number" && Number.isFinite(outputPrecision)
+            ? Math.min(
+                  OUTPUT_PRECISION_MAX,
+                  Math.max(OUTPUT_PRECISION_MIN, Math.trunc(outputPrecision)),
+              )
+            : 4,
+    );
+
     function formatValue(value: unknown): string {
         return typeof value === "number"
-            ? value.toFixed(outputPrecision)
+            ? value.toFixed(precision)
             : String(value);
     }
 </script>

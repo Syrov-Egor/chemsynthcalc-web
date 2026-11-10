@@ -1,6 +1,10 @@
 <script lang="ts">
     import { Label } from "$lib/components/ui/label/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
+    import {
+        OUTPUT_PRECISION_MAX,
+        OUTPUT_PRECISION_MIN,
+    } from "$lib/scripts/validation";
 
     let {
         disabled = false,
@@ -13,8 +17,8 @@
     <Input
         id="outputPrecision"
         type="number"
-        min={0}
-        max={15}
+        min={OUTPUT_PRECISION_MIN}
+        max={OUTPUT_PRECISION_MAX}
         step={1}
         {disabled}
         bind:value={outputPrecision}

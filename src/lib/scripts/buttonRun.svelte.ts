@@ -1,4 +1,6 @@
 import { wasmManager } from "./wasm.svelte";
+import { validateCalculationParams } from "./validation";
+import type { ControlInput } from "$lib/types";
 
 class CalculationManager {
     public isCalculating = $state(false)
@@ -9,7 +11,7 @@ class CalculationManager {
     // or error cannot overwrite the state of a newer run.
     private runId = 0
 
-    async run(controlInput: object, textInput: string) {
+    async run(controlInput: ControlInput, textInput: string) {
         // If already calculating, abort current calculation
         if (this.isCalculating) {
             this.shouldAbort = true
@@ -25,14 +27,24 @@ class CalculationManager {
         this.parsedResult = null
         this.calculationError = null
 
-        try {
-            const params = {
-                ...controlInput,
-                equation: textInput
-            }
+        const params = {
+            ...controlInput,
+            equation: textInput
+        }
 
+        // Reject invalid controls before they reach the worker so a bad value
+        // cannot crash rendering or request an unreasonable search.
+        const validation = validateCalculationParams(params)
+
+        if (!validation.ok) {
+            this.isCalculating = false
+            this.calculationError = validation.message
+            return
+        }
+
+        try {
             // Run calculation in Web Worker
-            const result = await wasmManager.calculate(params)
+            const result = await wasmManager.calculate(validation.params)
 
             // Check if this run is still the current one
             if (runId !== this.runId || this.shouldAbort) {

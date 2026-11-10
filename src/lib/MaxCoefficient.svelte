@@ -1,6 +1,10 @@
 <script lang="ts">
     import { Label } from "$lib/components/ui/label/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
+    import {
+        MAX_COMBINATIONS_MAX,
+        MAX_COMBINATIONS_MIN,
+    } from "$lib/scripts/validation";
 
     let {
         disabled = false,
@@ -13,7 +17,8 @@
     <Input
         id="maxCombinations"
         type="number"
-        min={1}
+        min={MAX_COMBINATIONS_MIN}
+        max={MAX_COMBINATIONS_MAX}
         step={1}
         {disabled}
         bind:value={maxCombinations}

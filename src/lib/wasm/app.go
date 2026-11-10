@@ -6,6 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
+	"strings"
 	"sync"
 	"syscall/js"
 )
@@ -41,6 +43,74 @@ type TabularData struct {
 	Formula string
 	Molar   float64
 	Masses  float64
+}
+
+// Limits mirror src/lib/scripts/validation.ts. They are enforced again here
+// because the exported WASM functions can be reached without going through the
+// Svelte UI: the worker bundle is a public asset, DevTools can evaluate in the
+// worker context, and future/test callers may post directly. This is
+// defense-in-depth rather than a security boundary (all work is client-side),
+// but it keeps a negative precision from wrapping to uint and prevents an
+// unbounded brute-force search.
+const (
+	minOutputPrecision = 0
+	maxOutputPrecision = 15
+
+	minFloatTolerance = 0
+	maxFloatTolerance = 15
+
+	minMaxCombinations = 1
+	maxMaxCombinations = 1000
+
+	minTargetNumber = -100
+	maxTargetNumber = 100
+)
+
+func validateParams(p CalculationParams) error {
+	if strings.TrimSpace(p.Equation) == "" {
+		return errors.New("enter a formula or equation")
+	}
+
+	switch p.Mode {
+	case "formula":
+		// Algorithm, run mode and max coefficient are not used in this mode.
+	case "balance":
+		switch p.Algorithm {
+		case "auto", "inv", "gpinv", "ppinv":
+		case "comb":
+			if p.MaxComb < minMaxCombinations || p.MaxComb > maxMaxCombinations {
+				return fmt.Errorf("max coefficient must be between %d and %d", minMaxCombinations, maxMaxCombinations)
+			}
+		default:
+			return fmt.Errorf("invalid balancing algorithm %q", p.Algorithm)
+		}
+	case "masses":
+		switch p.RunMode {
+		case "balance", "check", "force":
+		default:
+			return fmt.Errorf("invalid run mode %q", p.RunMode)
+		}
+	default:
+		return fmt.Errorf("invalid calculation mode %q", p.Mode)
+	}
+
+	if p.OutputPrecision < minOutputPrecision || p.OutputPrecision > maxOutputPrecision {
+		return fmt.Errorf("output precision must be between %d and %d", minOutputPrecision, maxOutputPrecision)
+	}
+
+	if p.FloatTolerance < minFloatTolerance || p.FloatTolerance > maxFloatTolerance {
+		return fmt.Errorf("float tolerance must be between %d and %d", minFloatTolerance, maxFloatTolerance)
+	}
+
+	if p.TargetNum < minTargetNumber || p.TargetNum > maxTargetNumber {
+		return fmt.Errorf("target number must be between %d and %d", minTargetNumber, maxTargetNumber)
+	}
+
+	if math.IsNaN(p.TargetMass) || math.IsInf(p.TargetMass, 0) || p.TargetMass < 0 {
+		return errors.New("target mass must be a non-negative finite number")
+	}
+
+	return nil
 }
 
 func Run(this js.Value, args []js.Value) any {
@@ -160,6 +230,10 @@ func (a *App) IsCalculating() bool {
 }
 
 func (a *App) PerformCalculation(params CalculationParams) CalculationResult {
+	if err := validateParams(params); err != nil {
+		return errorousCalculation(err.Error())
+	}
+
 	a.cancelMutex.Lock()
 
 	// If already calculating, return error

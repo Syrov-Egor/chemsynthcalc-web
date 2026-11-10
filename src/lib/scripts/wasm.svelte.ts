@@ -1,6 +1,11 @@
+import {
+    validateCalculationParams,
+    type CalculationParams
+} from "./validation"
+
 type WorkerMessage =
     | { type: 'init' }
-    | { type: 'calculate', id: number, params: any }
+    | { type: 'calculate', id: number, params: CalculationParams }
     | { type: 'abort' }
 
 type WorkerResponse =
@@ -208,7 +213,16 @@ class WasmManager {
         }
     }
 
-    async calculate(params: any): Promise<string> {
+    async calculate(params: CalculationParams): Promise<string> {
+        // Validate again at the posting boundary so no caller can bypass the
+        // control validation done by the calculation manager.
+        const validation = validateCalculationParams(params)
+        if (!validation.ok) {
+            throw new Error(validation.message)
+        }
+
+        params = validation.params
+
         // A new request supersedes any in-flight one. Terminating is the only
         // way to interrupt synchronous WASM work, so the worker is recreated
         // and reloaded before the new request is posted.

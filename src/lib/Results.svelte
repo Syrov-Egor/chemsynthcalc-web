@@ -1,11 +1,15 @@
 <script lang="ts">
     import { calculationManager } from "./scripts/buttonRun.svelte";
+    import { validateControlInput } from "./scripts/validation";
     import ResultsDetails from "./ResultsDetails.svelte";
     import ResultsTable from "./ResultsTable.svelte";
     import { Spinner } from "$lib/components/ui/spinner/index.js";
 
     let { controlInput } = $props();
     let mode = $derived(controlInput.mode);
+    let validationError = $derived(
+        validateControlInput(controlInput)[0]?.message ?? "",
+    );
 </script>
 
 <section id="results-section" class="px-6 py-4">
@@ -20,6 +24,10 @@
                     <Spinner />
                     <span>Calculating...</span>
                 </div>
+            {:else if validationError}
+                <p id="validation-error" class="error text-base text-destructive">
+                    Error: {validationError}
+                </p>
             {:else if calculationManager.calculationError}
                 <p id="status-text" class="error text-base text-destructive">
                     Error: {calculationManager.calculationError}
