@@ -11,7 +11,6 @@ import (
 )
 
 type App struct {
-	ctx           context.Context
 	cancelFunc    context.CancelFunc
 	cancelMutex   sync.RWMutex
 	isCalculating bool
