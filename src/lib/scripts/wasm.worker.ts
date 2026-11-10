@@ -11,7 +11,7 @@ declare global {
                 importObject: WebAssembly.Imports
             }
         }
-        runCalculation?: (params: any) => string
+        runCalculation?: (params: any) => unknown
         stopCalculation?: () => void
         isCalculating?: () => boolean
     }
@@ -118,7 +118,9 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                     const result = runCalculation(message.params)
                     self.postMessage({
                         type: 'result',
-                        result: result
+                        // Go hands back a plain JS object; serialize it here so
+                        // the WASM binary doesn't need encoding/json.
+                        result: JSON.stringify(result)
                     } as WorkerResponse)
                 } catch (error) {
                     console.error('[Worker] Error:', error)

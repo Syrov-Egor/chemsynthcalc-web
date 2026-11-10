@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"regexp"
 	"strings"
 
 	g "github.com/Syrov-Egor/gosynthcalc"
@@ -49,7 +48,7 @@ func calcFormulaMode(ctx context.Context, params *CalculationParams) Calculation
 
 		var output strings.Builder
 		output.WriteString(out)
-		output.WriteString(fmt.Sprintf("\ncustom oxide percent: %v", customOxides))
+		fmt.Fprintf(&output, "\ncustom oxide percent: %v", customOxides)
 		return CalculationResult{Success: true, Message: "", Details: output.String()}
 	}
 }
@@ -62,11 +61,8 @@ func parseCustomOxides(input string) (formula string, oxides []string, err error
 	}
 	formulaStr := split[0]
 	oxidesStr := split[1]
-	allowedSymbols := regexp.MustCompile(`[^a-zA-Z0-9.,]`)
-	invalid := allowedSymbols.FindAllString(oxidesStr, -1)
-	if len(invalid) > 0 {
-		return "", nil, fmt.Errorf("there are invalid symbols in custoom oxides: %v", invalid)
-	}
+	// Custom oxides are validated by gosynthcalc itself (chemical formula
+	// parsing), so no symbol check is duplicated here.
 	parsed := strings.Split(oxidesStr, ",")
 
 	return formulaStr, parsed, nil
@@ -196,9 +192,9 @@ func calcBalanceMode(ctx context.Context, params *CalculationParams) Calculation
 
 	var output strings.Builder
 
-	output.WriteString(fmt.Sprintf("Method: %s \n", method))
-	output.WriteString(fmt.Sprintf("Coefficients: %v \n", calcResult))
-	output.WriteString(fmt.Sprintf("Final reaction: %s \n", finalReaction))
+	fmt.Fprintf(&output, "Method: %s \n", method)
+	fmt.Fprintf(&output, "Coefficients: %v \n", calcResult)
+	fmt.Fprintf(&output, "Final reaction: %s \n", finalReaction)
 
 	return CalculationResult{Success: true, Message: "", Details: output.String()}
 }
