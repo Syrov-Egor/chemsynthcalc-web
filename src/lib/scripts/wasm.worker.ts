@@ -1,4 +1,7 @@
-import wasmExec from '$lib/wasm/wasm_exec?raw'
+// Side-effect import of the TinyGo glue. Importing it as a module (rather than
+// evaluating its text with `eval`) lets the site run under a CSP without
+// 'unsafe-eval'. The glue only defines globals such as `globalThis.Go`.
+import '$lib/wasm/wasm_exec.js'
 import wasmUrl from '$lib/wasm/main.wasm?url'
 
 let isCalculating = false
@@ -36,9 +39,6 @@ async function initWasm() {
     }
 
     try {
-        // Execute the wasm_exec.js code to set up the Go environment
-        eval(wasmExec)
-
         if (!WebAssembly.instantiateStreaming) {
             // polyfill
             WebAssembly.instantiateStreaming = async (resp, importObject) => {
