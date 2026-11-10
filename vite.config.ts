@@ -35,7 +35,7 @@ const cspPlugin: Plugin = {
 // https://vite.dev/config/
 export default defineConfig(({ command, isPreview }) => ({
   base: command === "build" || isPreview ? "/chemsynthcalc-web/" : "/",
-  plugins: [tailwindcss(), svelte(), cspPlugin, visualizer({ open: true })],
+  plugins: [tailwindcss(), svelte(), cspPlugin, visualizer({ open: false })],
   server: { host: '127.0.0.1', port: 5173 },
   resolve: {
     alias: {
