@@ -27,7 +27,6 @@
     onclick={onClickButtonRun}
     variant={calculationManager.isCalculating ? "destructive" : "default"}
     class={cn(className, calculationManager.isCalculating && "calculating")}
-    disabled={wasmManager.isLoading}
 >
     <span id="button-text">
         {calculationManager.isCalculating ? "Stop" : "Run"}
