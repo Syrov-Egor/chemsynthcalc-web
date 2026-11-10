@@ -34,6 +34,48 @@
     const isActive = (href: string) => hash === href;
 </script>
 
+{#snippet versionLabel()}
+    <span
+        class="flex h-8 items-center px-2.5 text-sm font-medium text-sidebar-primary"
+    >
+        chemsynthcalc v{version}
+    </span>
+{/snippet}
+
+{#snippet navLink(link: (typeof links)[number], mobile = false)}
+    <Button
+        href={link.href}
+        variant={isActive(link.href) ? "secondary" : "ghost"}
+        size={mobile ? "default" : "sm"}
+        class={mobile ? "w-full justify-start" : undefined}
+        aria-current={isActive(link.href) ? "page" : undefined}
+        onclick={mobile ? () => (open = false) : undefined}
+    >
+        <link.icon class="size-4" />
+        {link.label}
+    </Button>
+{/snippet}
+
+{#snippet themeButton(mobile = false)}
+    <Button
+        onclick={toggleMode}
+        variant="ghost"
+        size={mobile ? "default" : "sm"}
+        class={mobile ? "w-full justify-start" : undefined}
+        aria-label="Theme"
+    >
+        <span class="relative flex size-4 items-center justify-center">
+            <MoonIcon
+                class="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
+            />
+            <SunIcon
+                class="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
+            />
+        </span>
+        Theme
+    </Button>
+{/snippet}
+
 <svelte:window onhashchange={() => (hash = window.location.hash || "#home")} />
 
 <header class="border-b">
@@ -61,53 +103,11 @@
                         <Sheet.Title>Menu</Sheet.Title>
                     </Sheet.Header>
                     <ul class="flex flex-col gap-1 px-4">
-                        <li>
-                            <span
-                                class="flex h-8 items-center px-2.5 text-sm font-medium text-sidebar-primary"
-                            >
-                                chemsynthcalc v{version}
-                            </span>
-                        </li>
+                        <li>{@render versionLabel()}</li>
                         {#each links as link (link.href)}
-                            <li>
-                                <Button
-                                    href={link.href}
-                                    variant={isActive(link.href)
-                                        ? "secondary"
-                                        : "ghost"}
-                                    class="w-full justify-start"
-                                    aria-current={isActive(link.href)
-                                        ? "page"
-                                        : undefined}
-                                    onclick={() => (open = false)}
-                                >
-                                    {#if link.icon}
-                                        <link.icon class="size-4" />
-                                    {/if}
-                                    {link.label}
-                                </Button>
-                            </li>
+                            <li>{@render navLink(link, true)}</li>
                         {/each}
-                        <li>
-                            <Button
-                                onclick={toggleMode}
-                                variant="ghost"
-                                class="w-full justify-start"
-                                aria-label="Theme"
-                            >
-                                <span
-                                    class="relative flex size-4 items-center justify-center"
-                                >
-                                    <SunIcon
-                                        class="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
-                                    />
-                                    <MoonIcon
-                                        class="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
-                                    />
-                                </span>
-                                Theme
-                            </Button>
-                        </li>
+                        <li>{@render themeButton(true)}</li>
                     </ul>
                 </Sheet.Content>
             </Sheet.Root>
@@ -115,48 +115,11 @@
 
         <!-- Desktop: inline links -->
         <ul class="hidden items-center gap-1 md:flex">
-            <li>
-                <span
-                    class="flex h-8 items-center px-2.5 text-sm font-medium text-sidebar-primary"
-                >
-                    chemsynthcalc v{version}
-                </span>
-            </li>
+            <li>{@render versionLabel()}</li>
             {#each links as link (link.href)}
-                <li>
-                    <Button
-                        href={link.href}
-                        variant={isActive(link.href) ? "secondary" : "ghost"}
-                        size="sm"
-                        aria-current={isActive(link.href) ? "page" : undefined}
-                    >
-                        {#if link.icon}
-                            <link.icon class="size-4" />
-                        {/if}
-                        {link.label}
-                    </Button>
-                </li>
+                <li>{@render navLink(link)}</li>
             {/each}
-            <li>
-                <Button
-                    onclick={toggleMode}
-                    variant="ghost"
-                    size="sm"
-                    aria-label="Theme"
-                >
-                    <span
-                        class="relative flex size-4 items-center justify-center"
-                    >
-                        <SunIcon
-                            class="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
-                        />
-                        <MoonIcon
-                            class="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
-                        />
-                    </span>
-                    Theme
-                </Button>
-            </li>
+            <li>{@render themeButton()}</li>
         </ul>
     </nav>
 </header>
