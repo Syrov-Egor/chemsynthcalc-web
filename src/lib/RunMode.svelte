@@ -15,15 +15,14 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
-    <Label>Run Mode</Label>
+    <Label for="run-mode-select">Run Mode</Label>
     <Select.Root
         type="single"
-        name="RunModes"
         items={runModes}
         bind:value={runMode}
         {disabled}
     >
-        <Select.Trigger class="w-full">
+        <Select.Trigger id="run-mode-select" class="w-full">
             <Select.Value placeholder="Select a run mode" />
         </Select.Trigger>
         <Select.Content class="w-(--bits-select-anchor-width)">

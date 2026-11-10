@@ -10,7 +10,7 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
-    <Label for="targetNumber">Target #</Label>
+    <Label for="target-number">Target #</Label>
     <Input
         id="target-number"
         type="number"

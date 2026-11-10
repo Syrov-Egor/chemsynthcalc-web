@@ -17,15 +17,14 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
-    <Label>Algorithm</Label>
+    <Label for="algorithm-select">Algorithm</Label>
     <Select.Root
         type="single"
-        name="Algorithms"
         items={algos}
         bind:value={algorithm}
         {disabled}
     >
-        <Select.Trigger class="w-full">
+        <Select.Trigger id="algorithm-select" class="w-full">
             <Select.Value placeholder="Select an algorithm" />
         </Select.Trigger>
         <Select.Content class="w-(--bits-select-anchor-width)">

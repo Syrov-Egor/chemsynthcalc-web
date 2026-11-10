@@ -9,9 +9,9 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
-    <Label>Input</Label>
+    <Label for="equation-input">Input</Label>
     <InputGroup.Root>
-        <InputGroup.Input {placeholder} bind:value={textInput} />
+        <InputGroup.Input id="equation-input" {placeholder} bind:value={textInput} />
         {#if textInput}
             <InputGroup.Addon align="inline-end">
                 <InputGroup.Button

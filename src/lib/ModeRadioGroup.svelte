@@ -7,6 +7,7 @@
 
 <RadioGroup.Root
     bind:value={mode}
+    aria-label="Input mode"
     class="grid grid-cols-3 lg:grid-cols-1 gap-2 lg:gap-3 lg:w-auto"
 >
     <div class="flex items-center gap-3">
