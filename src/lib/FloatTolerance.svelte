@@ -9,7 +9,11 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
-    <Label for="floatTolerance">Float Tolerance</Label>
+    <Label for="floatTolerance">
+        <span>
+            Float Tolerance (1×10<sup class="text-[0.7em] align-super leading-none">−x</sup>)
+        </span>
+    </Label>
     <Input
         id="floatTolerance"
         type="number"

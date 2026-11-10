@@ -9,7 +9,7 @@
 </script>
 
 <div class="flex flex-col gap-2 w-full min-w-0">
-    <Label for="targetMass">Target Mass</Label>
+    <Label for="targetMass">Target Mass (g)</Label>
     <Input
         id="targetMass"
         type="number"
