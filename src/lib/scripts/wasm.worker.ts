@@ -22,13 +22,13 @@ declare global {
 
 type WorkerMessage =
     | { type: 'init' }
-    | { type: 'calculate', params: any }
+    | { type: 'calculate', id: number, params: any }
     | { type: 'abort' }
 
 type WorkerResponse =
     | { type: 'ready' }
-    | { type: 'result', result: string }
-    | { type: 'error', error: string }
+    | { type: 'result', id: number, result: string }
+    | { type: 'error', id?: number, error: string }
 
 let wasmLoaded = false
 
@@ -85,6 +85,10 @@ function waitForFunction(name: string, timeout: number): Promise<void> {
 self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
     const message = event.data
 
+    // Calculation errors are tagged with the request ID so the main thread can
+    // ignore responses that belong to a request it has already abandoned.
+    const requestId = message.type === 'calculate' ? message.id : undefined
+
     try {
         switch (message.type) {
             case 'init':
@@ -101,6 +105,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                 if (isCalculating) {
                     self.postMessage({
                         type: 'error',
+                        id: requestId,
                         error: 'Another calculation is already in progress'
                     } as WorkerResponse)
                     break
@@ -118,6 +123,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                     const result = runCalculation(message.params)
                     self.postMessage({
                         type: 'result',
+                        id: requestId,
                         // Go hands back a plain JS object; serialize it here so
                         // the WASM binary doesn't need encoding/json.
                         result: JSON.stringify(result)
@@ -126,6 +132,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                     console.error('[Worker] Error:', error)
                     self.postMessage({
                         type: 'error',
+                        id: requestId,
                         error: error instanceof Error ? error.message : String(error)
                     } as WorkerResponse)
                 } finally {
@@ -151,6 +158,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
         console.error('[Worker] Error:', error)
         self.postMessage({
             type: 'error',
+            id: requestId,
             error: error instanceof Error ? error.message : String(error)
         } as WorkerResponse)
     }

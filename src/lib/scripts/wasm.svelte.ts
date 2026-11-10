@@ -1,14 +1,32 @@
 type WorkerMessage =
     | { type: 'init' }
-    | { type: 'calculate', params: any }
+    | { type: 'calculate', id: number, params: any }
     | { type: 'abort' }
 
 type WorkerResponse =
     | { type: 'ready' }
-    | { type: 'result', result: string }
-    | { type: 'error', error: string }
+    | { type: 'result', id: number, result: string }
+    | { type: 'error', id?: number, error: string }
 
 const INIT_TIMEOUT_MS = 120000
+
+// Practical upper bound for a single calculation. Typical runs finish in
+// milliseconds; failing after two minutes keeps a wedged worker from blocking
+// retries for the lifetime of the page.
+const CALCULATION_TIMEOUT_MS = 120000
+
+interface CalculationRequest {
+    id: number
+    resolve: (result: string) => void
+    reject: (error: Error) => void
+    timer: ReturnType<typeof setTimeout>
+    settled: boolean
+}
+
+interface CalculationOutcome {
+    result?: string
+    error?: Error
+}
 
 class WasmManager {
     private worker: Worker | null = null
@@ -17,10 +35,8 @@ class WasmManager {
     private loadPromise: Promise<void> | null = null
     private initializationFailure: ((error: Error) => void) | null = null
     private messageHandlers: Map<string, (data: any) => void> = new Map()
-    private currentCalculation: {
-        resolve: (result: string) => void,
-        reject: (error: Error) => void
-    } | null = null
+    private nextCalculationId = 1
+    private currentCalculation: CalculationRequest | null = null
 
     get isLoaded() {
         return this.loaded
@@ -72,7 +88,22 @@ class WasmManager {
         worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
             const response = event.data
 
-            // Call any registered handlers
+            // Calculation responses are matched by request ID so a late result
+            // from a superseded request can never settle the current one.
+            if (response.type === 'result') {
+                this.settleCalculation(response.id, { result: response.result })
+                return
+            }
+
+            if (response.type === 'error' && response.id !== undefined) {
+                this.settleCalculation(response.id, {
+                    error: new Error(response.error)
+                })
+                return
+            }
+
+            // Initialization messages (`ready`, or an error without a request
+            // ID) go through the registered init handlers.
             const handler = this.messageHandlers.get(response.type)
             if (handler) {
                 handler(response)
@@ -89,8 +120,7 @@ class WasmManager {
             this.failInitialization(error)
 
             if (this.currentCalculation) {
-                this.currentCalculation.reject(error)
-                this.currentCalculation = null
+                this.finishCalculation(this.currentCalculation, { error })
             }
         }
 
@@ -179,56 +209,92 @@ class WasmManager {
     }
 
     async calculate(params: any): Promise<string> {
-        // If we have a current calculation, reject it first
+        // A new request supersedes any in-flight one. Terminating is the only
+        // way to interrupt synchronous WASM work, so the worker is recreated
+        // and reloaded before the new request is posted.
         if (this.currentCalculation) {
-            this.currentCalculation.reject(new Error('New calculation started before previous completed'))
-            this.currentCalculation = null
+            this.terminate(
+                'New calculation started before previous completed'
+            )
         }
 
         if (!this.loaded) {
             await this.load()
         }
 
-        return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => {
-                if (this.currentCalculation) {
-                    this.currentCalculation.reject(new Error('Calculation timeout'))
-                    this.currentCalculation = null
-                }
-            }, 3000000)
-
-            this.currentCalculation = { resolve, reject }
-
-            const resultHandler = (response: WorkerResponse) => {
-                clearTimeout(timeout)
-                this.messageHandlers.delete('result')
-                this.messageHandlers.delete('error')
-                this.currentCalculation = null
-
-                if (response.type === 'result') {
-                    resolve(response.result)
-                }
+        return new Promise<string>((resolve, reject) => {
+            const request: CalculationRequest = {
+                id: this.nextCalculationId++,
+                resolve,
+                reject,
+                // Assigned immediately below; the request is only reachable
+                // through `currentCalculation` afterwards.
+                timer: undefined as unknown as ReturnType<typeof setTimeout>,
+                settled: false
             }
 
-            const errorHandler = (response: WorkerResponse) => {
-                clearTimeout(timeout)
-                this.messageHandlers.delete('result')
-                this.messageHandlers.delete('error')
-                this.currentCalculation = null
-
-                if (response.type === 'error') {
-                    reject(new Error(response.error))
+            request.timer = setTimeout(() => {
+                // A matching request that exceeds the deadline cannot be
+                // cancelled cooperatively, so terminate the worker and reject
+                // through the same cleanup path as every other outcome.
+                if (
+                    !request.settled &&
+                    this.currentCalculation === request
+                ) {
+                    this.terminate('Calculation timeout')
                 }
+            }, CALCULATION_TIMEOUT_MS)
+
+            this.currentCalculation = request
+
+            if (!this.worker) {
+                this.finishCalculation(request, {
+                    error: new Error('Worker is not available')
+                })
+                return
             }
 
-            this.messageHandlers.set('result', resultHandler)
-            this.messageHandlers.set('error', errorHandler)
-
-            this.worker?.postMessage({
+            this.worker.postMessage({
                 type: 'calculate',
+                id: request.id,
                 params
             } as WorkerMessage)
         })
+    }
+
+    // Settle the current request only if the response belongs to it.
+    private settleCalculation(id: number, outcome: CalculationOutcome) {
+        const request = this.currentCalculation
+        if (!request || request.id !== id) {
+            // Stale response from a request that was already superseded,
+            // aborted, or timed out.
+            return
+        }
+        this.finishCalculation(request, outcome)
+    }
+
+    // Single place where a request is marked settled, its timer is cleared,
+    // and its promise is resolved or rejected.
+    private finishCalculation(
+        request: CalculationRequest,
+        outcome: CalculationOutcome
+    ) {
+        if (request.settled) {
+            return
+        }
+
+        request.settled = true
+        clearTimeout(request.timer)
+
+        if (this.currentCalculation === request) {
+            this.currentCalculation = null
+        }
+
+        if (outcome.error) {
+            request.reject(outcome.error)
+        } else {
+            request.resolve(outcome.result ?? '')
+        }
     }
 
     abort() {
@@ -239,13 +305,15 @@ class WasmManager {
 
     terminate(reason = 'Calculation aborted') {
         this.failInitialization(new Error(reason))
-        this.disposeWorker()
-        this.messageHandlers.clear()
 
         if (this.currentCalculation) {
-            this.currentCalculation.reject(new Error(reason))
-            this.currentCalculation = null
+            this.finishCalculation(this.currentCalculation, {
+                error: new Error(reason)
+            })
         }
+
+        this.disposeWorker()
+        this.messageHandlers.clear()
 
         this.loadPromise = null
         this.loaded = false
