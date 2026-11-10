@@ -35,3 +35,12 @@ tasks:
     dir: "{{.WASM_PATH}}"
     cmds:
       - wasm-opt main.wasm -Oz --strip-debug --strip-producers -o main.wasm
+
+  wasm-lint:
+      desc: "Lint go-wasm module with golangci-lint"
+      dir: "{{.WASM_PATH}}"
+      env:
+        GOOS: js
+        GOARCH: wasm
+      cmds:
+        - golangci-lint run --enable gocritic ./...
