@@ -29,11 +29,41 @@ type WorkerResponse =
     | { type: 'ready' }
     | { type: 'result', id: number, result: string }
     | { type: 'error', id?: number, error: string }
+    | { type: 'fatal', error: string }
 
 let wasmLoaded = false
+// A Go runtime that has exited or panicked cannot be restarted inside this
+// worker. Once this is set, every further message is rejected and the main
+// thread is expected to terminate and recreate the worker.
+let runtimeFailed = false
+
+function errorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : String(error)
+}
+
+// Report an unrecoverable runtime failure to the main thread. The worker stays
+// alive only long enough for the message to be delivered; the main thread
+// terminates it and creates a fresh one on the next attempt.
+function markRuntimeFailed(error: unknown) {
+    if (runtimeFailed) {
+        return
+    }
+
+    runtimeFailed = true
+    wasmLoaded = false
+    console.error('[Worker] Go runtime failed:', error)
+    self.postMessage({
+        type: 'fatal',
+        error: `Go runtime failed: ${errorMessage(error)}`
+    } as WorkerResponse)
+}
 
 // Load and execute the Go WASM runtime
 async function initWasm() {
+    if (runtimeFailed) {
+        throw new Error('Go runtime is no longer available')
+    }
+
     if (wasmLoaded) {
         return
     }
@@ -53,11 +83,21 @@ async function initWasm() {
             go.importObject
         )
 
-        // Run Go runtime (this sets up the WASM environment)
-        go.run(result.instance)
+        // `go.run` resolves when the Go program exits and rejects when the
+        // runtime traps or aborts. It must never be fire-and-forget: an
+        // unobserved rejection would leave this worker marked as loaded and
+        // every later call would wait for the calculation timeout.
+        void go.run(result.instance).then(
+            () => markRuntimeFailed(new Error('Go runtime exited unexpectedly')),
+            (error: unknown) => markRuntimeFailed(error)
+        )
 
         // Wait for functions to be available
         await waitForFunction('runCalculation', 5000)
+
+        if (runtimeFailed) {
+            throw new Error('Go runtime exited before it was ready')
+        }
 
         wasmLoaded = true
     } catch (error) {
@@ -73,6 +113,11 @@ function waitForFunction(name: string, timeout: number): Promise<void> {
             if ((self as any)[name]) {
                 clearInterval(interval)
                 resolve()
+            } else if (runtimeFailed) {
+                // Stop waiting as soon as the runtime is known to be dead
+                // instead of burning the full timeout.
+                clearInterval(interval)
+                reject(new Error('Go runtime exited before it was ready'))
             } else if (Date.now() - start > timeout) {
                 clearInterval(interval)
                 reject(new Error(`Timeout waiting for ${name}`))
@@ -97,6 +142,10 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                 break
 
             case 'calculate':
+                if (runtimeFailed) {
+                    throw new Error('Go runtime is no longer available')
+                }
+
                 if (!wasmLoaded) {
                     await initWasm()
                 }
@@ -133,7 +182,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                     self.postMessage({
                         type: 'error',
                         id: requestId,
-                        error: error instanceof Error ? error.message : String(error)
+                        error: errorMessage(error)
                     } as WorkerResponse)
                 } finally {
                     isCalculating = false
@@ -159,7 +208,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
         self.postMessage({
             type: 'error',
             id: requestId,
-            error: error instanceof Error ? error.message : String(error)
+            error: errorMessage(error)
         } as WorkerResponse)
     }
 }

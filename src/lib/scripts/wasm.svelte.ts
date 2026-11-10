@@ -12,6 +12,7 @@ type WorkerResponse =
     | { type: 'ready' }
     | { type: 'result', id: number, result: string }
     | { type: 'error', id?: number, error: string }
+    | { type: 'fatal', error: string }
 
 const INIT_TIMEOUT_MS = 120000
 
@@ -93,6 +94,14 @@ class WasmManager {
         worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
             const response = event.data
 
+            // The Go runtime exited or panicked. This worker can never run
+            // another calculation, so reject any pending work, drop it, and
+            // let the next load() create a fresh worker.
+            if (response.type === 'fatal') {
+                this.handleWorkerFailure(worker, new Error(response.error))
+                return
+            }
+
             // Calculation responses are matched by request ID so a late result
             // from a superseded request can never settle the current one.
             if (response.type === 'result') {
@@ -117,16 +126,10 @@ class WasmManager {
 
         worker.onerror = (event) => {
             console.error('Worker error:', event)
-            const error = new Error(
-                `Worker error: ${event.message || 'unknown error'}`
+            this.handleWorkerFailure(
+                worker,
+                new Error(`Worker error: ${event.message || 'unknown error'}`)
             )
-
-            // Initialization must reject immediately instead of waiting for the timeout.
-            this.failInitialization(error)
-
-            if (this.currentCalculation) {
-                this.finishCalculation(this.currentCalculation, { error })
-            }
         }
 
         try {
@@ -196,6 +199,27 @@ class WasmManager {
             this.initializationFailure = null
             failure(error)
         }
+    }
+
+    // A worker error or a fatal Go runtime message means the worker can never
+    // be reused. Reject initialization and any in-flight calculation
+    // immediately, then terminate the worker so the next load() starts clean.
+    private handleWorkerFailure(worker: Worker, error: Error) {
+        // Ignore failures reported by a worker that has already been replaced.
+        if (this.worker !== worker) {
+            return
+        }
+
+        this.failInitialization(error)
+
+        if (this.currentCalculation) {
+            this.finishCalculation(this.currentCalculation, { error })
+        }
+
+        this.disposeWorker(worker)
+        this.messageHandlers.clear()
+        this.loadPromise = null
+        this.loading = false
     }
 
     private disposeWorker(worker: Worker | null = this.worker) {

@@ -113,15 +113,29 @@ func validateParams(p CalculationParams) error {
 	return nil
 }
 
-func Run(this js.Value, args []js.Value) any {
+func Run(this js.Value, args []js.Value) (result any) {
 	if len(args) != 1 {
 		return nil
 	}
 
+	// A panic in a calculation must not take down the whole Go runtime and
+	// poison the worker. Convert it into a normal failure result so the UI can
+	// report it and the runtime stays usable. Runtime exits and traps are not
+	// recoverable (the release build uses -panic=trap); those surface through
+	// go.run and are handled as fatal on the JS side.
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Calculation panic:", r)
+			result = resultToJS(errorousCalculation(
+				fmt.Sprintf("Calculation panicked: %v", r),
+			))
+		}
+	}()
+
 	output, err := calculate(paramsFromJS(args[0]))
 	if err != nil {
 		fmt.Println("Calculation error:", err.Error())
-		return nil
+		return resultToJS(errorousCalculation(err.Error()))
 	}
 	return resultToJS(output)
 }
