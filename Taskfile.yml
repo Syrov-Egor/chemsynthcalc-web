@@ -36,6 +36,13 @@ tasks:
     cmds:
       - wasm-opt main.wasm -Oz --strip-debug --strip-producers -o main.wasm
 
+  wasm-release:
+    desc: "Copy matching glue, then build and optimize the release WASM module"
+    cmds:
+      - task: wasm-exec
+      - task: wasm-build
+      - task: wasm-optimize
+
   wasm-lint:
       desc: "Lint go-wasm module with golangci-lint"
       dir: "{{.WASM_PATH}}"
