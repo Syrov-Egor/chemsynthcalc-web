@@ -1,7 +1,13 @@
 <script lang="ts">
     import * as Table from "$lib/components/ui/table/index.js";
 
-    let { parsedResult } = $props();
+    let { parsedResult, outputPrecision = 4 } = $props();
+
+    function formatValue(value: unknown): string {
+        return typeof value === "number"
+            ? value.toFixed(outputPrecision)
+            : String(value);
+    }
 </script>
 
 {#if parsedResult?.tabular && parsedResult.tabular.length > 0}
@@ -19,7 +25,7 @@
                     <Table.Row>
                         {#each Object.values(row) as value, j (j)}
                             <Table.Cell class="font-semibold"
-                                >{value}</Table.Cell
+                                >{formatValue(value)}</Table.Cell
                             >
                         {/each}
                     </Table.Row>

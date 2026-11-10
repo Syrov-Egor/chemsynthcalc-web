@@ -32,6 +32,7 @@
                     />
                     <ResultsTable
                         parsedResult={calculationManager.parsedResult}
+                        outputPrecision={controlInput.outputPrecision}
                     />
                 </div>
             {:else}
