@@ -1,7 +1,14 @@
 <script lang="ts">
     import { prettyPrint } from "./scripts/pPrint.svelte";
+    import type { CalculationResult, Mode } from "$lib/types";
 
-    let { parsedResult, mode = $bindable() } = $props();
+    let {
+        parsedResult,
+        mode = $bindable(),
+    }: {
+        parsedResult: CalculationResult | null;
+        mode?: Mode;
+    } = $props();
 
     let isOpen = $derived(mode === "formula" || mode === "balance");
 </script>

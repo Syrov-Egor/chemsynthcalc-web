@@ -1,4 +1,6 @@
-import type { ControlInput } from "$lib/types";
+import type { CalculationParams, ControlInput } from "$lib/types";
+
+export type { CalculationParams } from "$lib/types";
 
 export const MODES = ["formula", "balance", "masses"] as const;
 export const ALGORITHMS = ["auto", "inv", "gpinv", "ppinv", "comb"] as const;
@@ -19,8 +21,6 @@ export const MAX_COMBINATIONS_MAX = 1000;
 
 export const TARGET_NUMBER_MIN = -100;
 export const TARGET_NUMBER_MAX = 100;
-
-export type CalculationParams = ControlInput & { equation: string };
 
 export type ValidationField = keyof CalculationParams;
 

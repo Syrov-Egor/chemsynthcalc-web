@@ -1,10 +1,10 @@
 import { wasmManager } from "./wasm.svelte";
 import { validateCalculationParams } from "./validation";
-import type { ControlInput } from "$lib/types";
+import type { CalculationResult, ControlInput } from "$lib/types";
 
 class CalculationManager {
     public isCalculating = $state(false)
-    public parsedResult = $state<any | null>(null)
+    public parsedResult = $state<CalculationResult | null>(null)
     public calculationError = $state<string | null>(null)
     private shouldAbort = $state(false)
     // Invalidates continuations of superseded or reset runs so a late result
@@ -51,28 +51,19 @@ class CalculationManager {
                 return
             }
 
-            try {
-                const parsed = JSON.parse(result)
-                this.calculationError = null
-                if (parsed.cancelled) {
-                    this.parsedResult = null
-                } else if (parsed.success) {
-                    this.parsedResult = parsed
-                } else {
-                    console.error('✗ Calculation failed:', parsed.message)
-                    if (parsed.details) {
-                        console.error('Error details:', parsed.details)
-                    }
-                    this.parsedResult = null
-                    this.calculationError = parsed.message || 'Calculation failed'
-                }
-            } catch (e) {
-                console.error('Parse error:', e)
-                console.log('Raw result:', result)
+            this.calculationError = null
+            if (result.cancelled) {
                 this.parsedResult = null
-                this.calculationError = 'Invalid result format'
+            } else if (result.success) {
+                this.parsedResult = result
+            } else {
+                console.error('✗ Calculation failed:', result.message)
+                if (result.details) {
+                    console.error('Error details:', result.details)
+                }
+                this.parsedResult = null
+                this.calculationError = result.message || 'Calculation failed'
             }
-
         } catch (error) {
             if (runId === this.runId && !this.shouldAbort) {
                 this.calculationError = error instanceof Error ? error.message : String(error)

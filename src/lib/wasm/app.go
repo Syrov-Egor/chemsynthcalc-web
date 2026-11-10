@@ -280,6 +280,6 @@ func (a *App) PerformCalculation(params CalculationParams) CalculationResult {
 	case "masses":
 		return calcMassesMode(ctx, &params)
 	default:
-		return CalculationResult{}
+		return errorousCalculation(fmt.Sprintf("invalid calculation mode %q", params.Mode))
 	}
 }

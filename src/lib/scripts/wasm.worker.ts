@@ -3,6 +3,8 @@
 // 'unsafe-eval'. The glue only defines globals such as `globalThis.Go`.
 import '$lib/wasm/wasm_exec.js'
 import wasmUrl from '$lib/wasm/main.wasm?url'
+import type { CalculationParams, CalculationResult } from '$lib/types'
+import type { WorkerRequest, WorkerResponse } from './workerProtocol'
 
 let isCalculating = false
 
@@ -14,22 +16,11 @@ declare global {
                 importObject: WebAssembly.Imports
             }
         }
-        runCalculation?: (params: any) => unknown
+        runCalculation?: (params: CalculationParams) => CalculationResult
         stopCalculation?: () => void
         isCalculating?: () => boolean
     }
 }
-
-type WorkerMessage =
-    | { type: 'init' }
-    | { type: 'calculate', id: number, params: any }
-    | { type: 'abort' }
-
-type WorkerResponse =
-    | { type: 'ready' }
-    | { type: 'result', id: number, result: string }
-    | { type: 'error', id?: number, error: string }
-    | { type: 'fatal', error: string }
 
 let wasmLoaded = false
 // A Go runtime that has exited or panicked cannot be restarted inside this
@@ -127,7 +118,7 @@ function waitForFunction(name: string, timeout: number): Promise<void> {
 }
 
 // Handle messages from main thread
-self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
+self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
     const message = event.data
 
     // Calculation errors are tagged with the request ID so the main thread can
@@ -173,9 +164,9 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                     self.postMessage({
                         type: 'result',
                         id: requestId,
-                        // Go hands back a plain JS object; serialize it here so
-                        // the WASM binary doesn't need encoding/json.
-                        result: JSON.stringify(result)
+                        // Go hands back a plain, structured-cloneable object.
+                        // Send it directly; the main thread validates its shape.
+                        result
                     } as WorkerResponse)
                 } catch (error) {
                     console.error('[Worker] Error:', error)

@@ -2,17 +2,9 @@ import {
     validateCalculationParams,
     type CalculationParams
 } from "./validation"
-
-type WorkerMessage =
-    | { type: 'init' }
-    | { type: 'calculate', id: number, params: CalculationParams }
-    | { type: 'abort' }
-
-type WorkerResponse =
-    | { type: 'ready' }
-    | { type: 'result', id: number, result: string }
-    | { type: 'error', id?: number, error: string }
-    | { type: 'fatal', error: string }
+import { parseCalculationResult } from "./workerProtocol"
+import type { WorkerRequest, WorkerResponse } from "./workerProtocol"
+import type { CalculationResult } from "$lib/types"
 
 const INIT_TIMEOUT_MS = 120000
 
@@ -23,16 +15,15 @@ const CALCULATION_TIMEOUT_MS = 120000
 
 interface CalculationRequest {
     id: number
-    resolve: (result: string) => void
+    resolve: (result: CalculationResult) => void
     reject: (error: Error) => void
     timer: ReturnType<typeof setTimeout>
     settled: boolean
 }
 
-interface CalculationOutcome {
-    result?: string
-    error?: Error
-}
+type CalculationOutcome =
+    | { result: CalculationResult }
+    | { error: Error }
 
 class WasmManager {
     private worker: Worker | null = null
@@ -40,7 +31,10 @@ class WasmManager {
     private loading = $state(false)
     private loadPromise: Promise<void> | null = null
     private initializationFailure: ((error: Error) => void) | null = null
-    private messageHandlers: Map<string, (data: any) => void> = new Map()
+    private messageHandlers = new Map<
+        WorkerResponse["type"],
+        (response: WorkerResponse) => void
+    >()
     private nextCalculationId = 1
     private currentCalculation: CalculationRequest | null = null
 
@@ -105,7 +99,17 @@ class WasmManager {
             // Calculation responses are matched by request ID so a late result
             // from a superseded request can never settle the current one.
             if (response.type === 'result') {
-                this.settleCalculation(response.id, { result: response.result })
+                try {
+                    const result = parseCalculationResult(response.result)
+                    this.settleCalculation(response.id, { result })
+                } catch (error) {
+                    this.settleCalculation(response.id, {
+                        error:
+                            error instanceof Error
+                                ? error
+                                : new Error(String(error))
+                    })
+                }
                 return
             }
 
@@ -189,7 +193,7 @@ class WasmManager {
                 }
             })
 
-            worker.postMessage({ type: 'init' } as WorkerMessage)
+            worker.postMessage({ type: 'init' } as WorkerRequest)
         })
     }
 
@@ -237,7 +241,7 @@ class WasmManager {
         }
     }
 
-    async calculate(params: CalculationParams): Promise<string> {
+    async calculate(params: CalculationParams): Promise<CalculationResult> {
         // Validate again at the posting boundary so no caller can bypass the
         // control validation done by the calculation manager.
         const validation = validateCalculationParams(params)
@@ -260,7 +264,7 @@ class WasmManager {
             await this.load()
         }
 
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<CalculationResult>((resolve, reject) => {
             const request: CalculationRequest = {
                 id: this.nextCalculationId++,
                 resolve,
@@ -296,7 +300,7 @@ class WasmManager {
                 type: 'calculate',
                 id: request.id,
                 params
-            } as WorkerMessage)
+            } as WorkerRequest)
         })
     }
 
@@ -328,10 +332,10 @@ class WasmManager {
             this.currentCalculation = null
         }
 
-        if (outcome.error) {
+        if ('error' in outcome) {
             request.reject(outcome.error)
         } else {
-            request.resolve(outcome.result ?? '')
+            request.resolve(outcome.result)
         }
     }
 

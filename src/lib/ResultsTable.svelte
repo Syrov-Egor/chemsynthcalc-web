@@ -4,8 +4,15 @@
         OUTPUT_PRECISION_MAX,
         OUTPUT_PRECISION_MIN,
     } from "$lib/scripts/validation";
+    import type { CalculationResult } from "$lib/types";
 
-    let { parsedResult, outputPrecision = 4 } = $props();
+    let {
+        parsedResult,
+        outputPrecision = 4,
+    }: {
+        parsedResult: CalculationResult | null;
+        outputPrecision?: number;
+    } = $props();
 
     let precision = $derived(
         typeof outputPrecision === "number" && Number.isFinite(outputPrecision)
@@ -36,11 +43,15 @@
             <Table.Body>
                 {#each parsedResult.tabular as row, i (i)}
                     <Table.Row>
-                        {#each Object.values(row) as value, j (j)}
-                            <Table.Cell class="font-semibold"
-                                >{formatValue(value)}</Table.Cell
-                            >
-                        {/each}
+                        <Table.Cell class="font-semibold"
+                            >{row.formula}</Table.Cell
+                        >
+                        <Table.Cell class="font-semibold"
+                            >{formatValue(row.molar)}</Table.Cell
+                        >
+                        <Table.Cell class="font-semibold"
+                            >{formatValue(row.masses)}</Table.Cell
+                        >
                     </Table.Row>
                 {/each}
             </Table.Body>
