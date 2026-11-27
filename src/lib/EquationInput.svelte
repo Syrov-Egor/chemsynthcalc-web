@@ -1,0 +1,28 @@
+<script lang="ts">
+    import { Label } from "$lib/components/ui/label/index.js";
+    import * as InputGroup from "$lib/components/ui/input-group/index.js";
+    import XIcon from "@lucide/svelte/icons/x";
+    import { inputPlaceholder } from "./scripts/inputPlaceholder.svelte";
+
+    let placeholder = inputPlaceholder();
+    let { textInput = $bindable() } = $props();
+</script>
+
+<div class="flex flex-col gap-2 w-full min-w-0">
+    <Label for="equation-input">Input</Label>
+    <InputGroup.Root>
+        <InputGroup.Input id="equation-input" {placeholder} bind:value={textInput} />
+        {#if textInput}
+            <InputGroup.Addon align="inline-end">
+                <InputGroup.Button
+                    variant="ghost"
+                    size="icon-xs"
+                    aria-label="Clear input"
+                    onclick={() => (textInput = "")}
+                >
+                    <XIcon />
+                </InputGroup.Button>
+            </InputGroup.Addon>
+        {/if}
+    </InputGroup.Root>
+</div>

@@ -4,30 +4,25 @@ A single-page web app for calculating the masses of substances required for chem
 ## How to use
 [Open the app](https://syrov-egor.github.io/chemsynthcalc-web/).
 
-See [GitHub Wiki](https://github.com/Syrov-Egor/chemsynthcalc-GUI/wiki) for instructions.
+See [GitHub Wiki](https://github.com/Syrov-Egor/chemsynthcalc-GUI/wiki/How-to-use) for instructions.
 
 ## Desktop and Android apps
 See [chemsynthcalc-GUI](https://github.com/Syrov-Egor/chemsynthcalc-GUI/releases).
 
 ## Build
-This app is using [Svelte](https://svelte.dev/) and [Flowbite](https://flowbite-svelte.com/). To build:
+This app is using [Svelte](https://svelte.dev/) and [shadcn-svelte](https://www.shadcn-svelte.com/). To build:
 `git clone` this repo, then:
 ```Bash
 npm install
 npm run build
 ```
+
 To publish it on GitHub pages:
 ```Bash
 npm run deploy
 ```
-To build an Android app:
-```Bash
-npx cap init
-npx cap add android
-npx cap sync
-```
 
-The Go code was compiled to WASM by [TinyGo](https://tinygo.org/) and optimized by [wasm-opt](https://github.com/WebAssembly/binaryen). To recompile it use `make`.
+The Go code was compiled to WASM by [TinyGo](https://tinygo.org/) and optimized by [wasm-opt](https://github.com/WebAssembly/binaryen). To recompile it use `task`. Task, TinyGo and binaryen's wasm-opt should be in PATH.
 
 ## License
 The code is provided under the MIT license.
